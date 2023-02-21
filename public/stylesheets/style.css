@@ -1,0 +1,32 @@
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#grid {
+  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(16, 1em);
+  /*grid-template-rows: repeat(2, 1fr);*/
+  gap: 1em;
+  grid-auto-rows: minmax(1em, 1em);
+  max-width: 25em;
+}
+
+#grid button {
+  text-align: right;
+  height: 2em;
+  width: 2em;
+}
