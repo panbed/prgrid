@@ -22,21 +22,30 @@ var context = new AudioContext();
 //var g = context.createGain();
 var o, g = null;
 
-function playNote(freq) {
+function playNote(freq, startTime, stopTime) {
     o = context.createOscillator();
-    g = context.createGain();
-    o.type = 'sawtooth';
-    o.connect(g);
+    //g = context.createGain();
+    o.type = 'square';
+    o.connect(context.destination);
     o.frequency.value = freq;
-    g.connect(context.destination);
-    o.start(0);
-    g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.5);
+    //g.connect(context.destination);
+    o.start(startTime);
+    //g.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + 0.25);
+    o.stop(stopTime);
 }
 
 function createNote(row, noteNum) {
-    console.log('#note' + noteNum);
+    //console.log('#note' + noteNum);
     $('#note' + noteNum).on('click', function() {
-        playNote(pitches[row]);
+        if ($(this).hasClass('live')) {
+            //console.log('removing live class');
+            $(this).removeClass('live');
+        }
+        else {
+            //console.log('adding live class');
+            $(this).addClass('live');
+        }
+        playNote(pitches[row], context.currentTime, context.currentTime + 0.1);
     });
 }
 
@@ -44,12 +53,27 @@ $(function() {
     var noteNum = 0;
     for (let row = 15; row >= 0; row--) {
         for (let column = 15; column >= 0; column--) {
-            createNote(row, noteNum);
-            noteNum++;
+            createNote(row, noteNum++);
         }
     }
+
+    var columnOffset = 0;
+    setInterval(function() {
+        if (columnOffset > 15) {
+            columnOffset = 0;
+        }
+        console.log(columnOffset);    
+        for (let i = 0; i <= 15; i++) {
+            
+            if ($('#note' + (columnOffset + (i * 16))).hasClass('live')) {
+                console.log('looking at note: ' + (columnOffset + (i * 16)));
+                playNote(pitches[15 - i], context.currentTime, context.currentTime + 0.150);
+            }
+        }
+        columnOffset++;
+    }, 150);
+
 });
 
-setInterval(function() {
 
-}, 1000);
+

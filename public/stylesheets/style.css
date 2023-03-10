@@ -29,4 +29,21 @@ a {
   text-align: right;
   height: 2em;
   width: 2em;
+
+  color: white;
+  background-color: var(--background);
+  border-color: var(--foreground);
+  border-radius: 5px;
+  border-style: solid;
+}
+
+#grid button:hover {
+  background-color: #2f2f2f;
+}
+
+.live {
+  background-color: var(--foreground) !important;
+}
+.live:hover {
+  background-color: #dfdfdf !important;
 }
