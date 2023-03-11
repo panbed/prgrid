@@ -16,24 +16,36 @@ a {
 }
 
 #grid {
+  /*
+  max-width: 100%;
+  position: fixed;
+  left: 50%;
+  margin-left: auto;
+  margin-right: auto;
+  transform: translate(-50%, 0);
+  */
   align-items: center;
   display: grid;
+  justify-content: center;
+  align-content: center;
   grid-template-columns: repeat(16, 1em);
   /*grid-template-rows: repeat(2, 1fr);*/
+  
+  
   gap: 1em;
   grid-auto-rows: minmax(1em, 1em);
   max-width: 25em;
+  
 }
 
 #grid button {
   text-align: right;
   height: 2em;
   width: 2em;
-
-  color: white;
+  color:white;
   background-color: var(--background);
-  border-color: var(--foreground);
-  border-radius: 5px;
+  border-color: #2f2f2f;
+  
   border-style: solid;
 }
 
@@ -43,7 +55,23 @@ a {
 
 .live {
   background-color: var(--foreground) !important;
+  border-color: #ffffff !important;
 }
+
 .live:hover {
   background-color: #dfdfdf !important;
+}
+
+.playing {
+  border-color: #4f4f4f !important;
+}
+
+.live.playing {
+  border-color: #2f2f2f !important;
+  border-width: 5px;
+}
+
+.ctrlbutton {
+  height: 2em;
+  width: 5em;
 }
