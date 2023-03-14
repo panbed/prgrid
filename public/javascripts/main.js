@@ -66,6 +66,10 @@ var selectedNotes = [];
 var currentwaveForm = 0;
 var vol = 0.3; // sorry for these global variables lol
 $(function() {
+    $('#menuButton').on('click', function() {
+        $('#menu').slideToggle('fast');
+    })
+
     let noteNum = 0;
     
     for (let row = 15; row >= 0; row--)
@@ -77,9 +81,7 @@ $(function() {
 
     $('#clearbutton').on('click', function() {
         $('div#grid').children().removeClass('live');
-        //console.log(selectedNotes);
         selectedNotes = [];
-        //console.log(selectedNotes);
     });
 
     $('#waveforms').on('click', function() {
@@ -111,7 +113,7 @@ $(function() {
     setInterval(function() {
         if (columnOffset > 15)
             columnOffset = 0;
-        //console.log(columnOffset);    
+
         for (let i = 0; i <= 15; i++) {
             activeNotes.push((columnOffset + (i * 16)));
             
@@ -137,8 +139,7 @@ $(function() {
                 $('#note' + j).removeClass('playing');
             }
         }
-        //console.log(activeNotes);
-        //console.log(selectedNotes);
+
         columnOffset++;
         activeNotes = [];
     }, 150);

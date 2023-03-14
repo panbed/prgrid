@@ -4,30 +4,34 @@ block content
   //h1= title
   //h3= 'minor pentatonic'
   
-  div(id='grid')
-    - var i = 0, j = 0, count = 0;
-    while i < 16
-      - j = 0
-      while j < 16
-        //button(id="note" + count)= count
-        button(id="note" + count)
-        - count++;
-        - j++
-      - i++
+  div(id='main')
+    div(id='grid')
+      - var i = 0, j = 0, count = 0;
+      while i < 16
+        - j = 0
+        while j < 16
+          button(id="note" + count)
+          - count++;
+          - j++
+        - i++
 
-  div(id='controls')
-    button(
-      id='clearbutton'
-    )= 'clear'
+  i(id= 'menuButton' class= 'fa fa-bars')
 
-    button(
-      id='waveforms'
-    )= 'waveform'
-    input(
-      type='range'
-      id='volume'
-      min='0'
-      max='1'
-      step='0.01'
-      value='0.3'
-    )
+  div(id='menu' style='display: none')
+    div(id='controls')
+      button(
+        id='clearbutton'
+      )= 'clear'
+
+      button(
+        id='waveforms'
+      )= 'waveform'
+      //- i(class= 'fa fa-volume-up')
+      input(
+        type='range'
+        id='volume'
+        min='0'
+        max='1'
+        step='0.01'
+        value='0.3'
+      )

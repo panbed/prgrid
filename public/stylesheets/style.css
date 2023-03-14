@@ -15,27 +15,56 @@ a {
   color: #00B7FF;
 }
 
-#grid {
-  /*
-  max-width: 100%;
-  position: fixed;
+#menuButton {
+  position: absolute;
+  background-color: #00000099;
+  color: var(--foreground);
+  border-style: solid;
+  border-radius: 5px;
+  border-width: 0.1em;
+  border-color: #2f2f2f00;
+  padding: 0.75em 0.75em 0.75em 0.75em;
+  opacity: 15%;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+
+#menuButton:hover {
+  opacity: 100%;
+  cursor: pointer;
+}
+
+#menu {
+  position: absolute;
+  width: 25em;
+  height: 10em;
+  color: var(--foreground);
+  background-color: var(--background);
+  border-style: solid;
+  margin-top: 2.75em;
+  padding: 0px 0px 0px 0px;
+  border-width: 0.1em;
+  border-color: #2f2f2f;
+  z-index: 95;
+}
+
+#main {
+  position: absolute;
+  top: 50%;
   left: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  transform: translate(-50%, 0);
-  */
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+
+#grid {
   align-items: center;
   display: grid;
   justify-content: center;
   align-content: center;
   grid-template-columns: repeat(16, 1em);
-  /*grid-template-rows: repeat(2, 1fr);*/
-  
-  
   gap: 1em;
   grid-auto-rows: minmax(1em, 1em);
   max-width: 25em;
-  
 }
 
 #grid button {
