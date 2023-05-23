@@ -9,6 +9,7 @@ body {
 
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /* font: 'VT323', monospace; */
 }
 
 a {
@@ -17,12 +18,9 @@ a {
 
 #menuButton {
   position: absolute;
-  background-color: #00000099;
+  background-color: #00000000;
   color: var(--foreground);
-  border-style: solid;
-  border-radius: 5px;
-  border-width: 0.1em;
-  border-color: #2f2f2f00;
+  border-style: none;
   padding: 0.75em 0.75em 0.75em 0.75em;
   opacity: 15%;
   transition: opacity 0.3s;
@@ -100,7 +98,31 @@ a {
   border-width: 5px;
 }
 
-.ctrlbutton {
-  height: 2em;
-  width: 5em;
+#controls {
+  margin-top: 2em;
+  text-align: center;
+}
+
+#controls button {
+  background-color: #00000000;
+  color: var(--foreground);
+  border-style: none;
+  padding: 0.75em 2.75em 0.75em 2.75em;
+  opacity: 15%;
+  transition: opacity 0.3s;
+}
+
+#controls i {
+  font-size: 1.5em;
+}
+
+#controls #waveforms {
+  font-family: 'VT323', monospace !important;
+  font-size: 1.5em;
+
+}
+
+#controls button:hover {
+  opacity: 100%;
+  cursor: pointer;
 }

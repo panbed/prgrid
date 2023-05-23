@@ -23,6 +23,9 @@ const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];
 var c = new AudioContext();
 var o, g = null;
 
+bars = ['', '', '', '', '', '', '', '']
+var currentBar = 0
+
 function playNote(freq, vol, waveform, startTime, stopTime) {
     o = c.createOscillator();
     g = c.createGain();
@@ -66,6 +69,7 @@ var selectedNotes = [];
 var currentwaveForm = 0;
 var vol = 0.3; // sorry for these global variables lol
 $(function() {
+    $('#waveforms').text(waveforms[currentwaveForm].slice(0, 4));
     $('#menuButton').on('click', function() {
         $('#menu').slideToggle('fast');
     })
@@ -89,6 +93,7 @@ $(function() {
         if (currentwaveForm > 3) {
             currentwaveForm = 0;
         }
+        $('#waveforms').text(waveforms[currentwaveForm].slice(0, 4));
         //$('#note' + noteNum).data('waveform', waveforms[currentwaveForm]);
         //$('div#grid').children().not('.live').data('waveform', waveforms[currentwaveForm]);
 
@@ -139,7 +144,7 @@ $(function() {
                 $('#note' + j).removeClass('playing');
             }
         }
-
+        console.log(selectedNotes);
         columnOffset++;
         activeNotes = [];
     }, 150);
