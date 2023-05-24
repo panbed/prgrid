@@ -49,16 +49,19 @@ function createNote(row, noteNum) {
     $('#note' + noteNum).data('noteNum', noteNum);
     $('#note' + noteNum).data('waveform', waveforms[currentwaveForm]);
     $('#note' + noteNum).on('click', function() {
-        console.log($(this).data('noteNum'));
+        // console.log($(this).data('noteNum'));
+
         if ($(this).hasClass('live')) {
             selectedNotes.splice(selectedNotes.indexOf(noteNum), 1);
             $(this).removeClass('live');
+            $(this).text("");
         }
         else {
             $('#note' + noteNum).data('waveform', waveforms[currentwaveForm]);
             //console.log('updated note waveform thing ' + $('#note' + noteNum).data('waveform'));
             selectedNotes.push(noteNum);
             $(this).addClass('live');
+            $(this).text(waveforms[currentwaveForm].slice(0,3));
             playNote(pitches[row], vol, waveforms[currentwaveForm], c.currentTime, c.currentTime + 0.1);
         }
         
@@ -85,6 +88,7 @@ $(function() {
 
     $('#clearbutton').on('click', function() {
         $('div#grid').children().removeClass('live');
+        $('div#grid').children().text("");
         selectedNotes = [];
     });
 

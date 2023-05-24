@@ -66,10 +66,11 @@ a {
 }
 
 #grid button {
+  font-family: 'VT323', monospace !important;
   text-align: right;
   height: 2em;
   width: 2em;
-  color:white;
+  color:black;
   background-color: var(--background);
   border-color: #2f2f2f;
   
