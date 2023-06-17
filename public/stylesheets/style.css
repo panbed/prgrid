@@ -73,7 +73,6 @@ a {
   color:black;
   background-color: var(--background);
   border-color: #2f2f2f;
-  
   border-style: solid;
 }
 
@@ -120,10 +119,56 @@ a {
 #controls #waveforms {
   font-family: 'VT323', monospace !important;
   font-size: 1.5em;
-
 }
 
 #controls button:hover {
   opacity: 100%;
   cursor: pointer;
 }
+
+#tabs {
+  padding: 2em;
+  text-align: center;
+}
+
+.tabbutton {
+  font-family: 'VT323', monospace !important;
+  text-align: center;
+  background-color: #0f0f0f;
+  color: var(--foreground);
+  /* border-style: none; */
+  border-color: #1f1f1f00;
+  height: 2em;
+  width: 5em;
+  opacity: 50%;
+  transition: opacity 0.3s;
+}
+
+.tabbutton:hover {
+  opacity: 100%;
+  cursor: pointer;
+}
+
+.activetab {
+  background-color: #1f1f1f !important; 
+}
+
+.emptytab {
+  background-color: #000000;
+}
+
+/* #menuButton {
+  position: absolute;
+  background-color: #00000000;
+  color: var(--foreground);
+  border-style: none;
+  padding: 0.75em 0.75em 0.75em 0.75em;
+  opacity: 15%;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+
+#menuButton:hover {
+  opacity: 100%;
+  cursor: pointer;
+} */

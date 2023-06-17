@@ -2,7 +2,13 @@ extends layout
 
 block content
   
+
   div(id='main')
+    div(id='tabs')
+      button(class='tabbutton' id='tab1') 1
+      button(class='tabbutton' id='tab2') 2
+      button(class='tabbutton' id='tab3') 3
+    
     div(id='grid')
       - var i = 0, j = 0, count = 0;
       while i < 16
@@ -14,10 +20,13 @@ block content
         - i++
 
     div(id='controls')
+      button(id='savebutton')
+        i(class='fa fa-floppy-o')
+      //- button(id='loadbutton')
+      //-   i(class='fa fa-upload')
       button(id='clearbutton')
         i(class='fa fa-trash-o')
       button(id='waveforms')
-        //- i(class='fa fa-align-center')
 
 
   div(id='menuButton')
@@ -32,4 +41,14 @@ block content
       step='0.01'
       value='0.3'
     )
+    input(
+      type='text'
+      id='loadtext'
+    )
+    br
+    button(id='loadbutton')
+      i(class='fa fa-upload')
+    button(id='exportbutton')
+      //- p export
+      i(class='fa fa-floppy-o')
 
