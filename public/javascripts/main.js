@@ -131,7 +131,8 @@ function loadNotes(noteString) {
 function changeTab(tab) {
     currentTab = tab;                                           // set global currentTab to new tab
     clearNotes();                                               // clear all notes on grid currently
-    loadNotes(localStorage.getItem('tab' + tab + 'data'));      // load notes from the string saved in localstorage
+    loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
+
 
     for (let i = 1; i <= 3; i++) {
         // change color of tab if its active
@@ -172,6 +173,13 @@ $(function() {
         clearNotes();
     });
 
+
+    // if the data doesnt exist then it breaks
+    if (localStorage.getItem('tab1data') == null) {
+        localStorage.setItem('tab1data', "X");
+        localStorage.setItem('tab2data', "X");
+        localStorage.setItem('tab3data', "X");
+    }
     // set the default tab to 1
     changeTab(1);
 
