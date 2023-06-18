@@ -1,16 +1,51 @@
 extends layout
 
 block content
-  
-
   div(id='main')
     div(id='tabs')
       button(class='tabbutton' id='tab1') 1
       button(class='tabbutton' id='tab2') 2
       button(class='tabbutton' id='tab3') 3
-    
-    div(id='grid')
-      - var i = 0, j = 0, count = 0;
+
+    div(id='layers')
+      button(class='layerbutton' id='layer1') a
+      button(class='layerbutton' id='layer2') b
+      button(class='layerbutton' id='layer3') c
+      button(class='layerbutton' id='layer4') d
+
+    - var count = 0;
+    div(class='gridstyle' id='grid1')
+      - var i = 0, j = 0
+      while i < 16
+        - j = 0
+        while j < 16
+          button(id="note" + count)
+          - count++;
+          - j++
+        - i++
+
+    div(class='gridstylehidden' id='grid2')
+      - var i = 0, j = 0;
+      while i < 16
+        - j = 0
+        while j < 16
+          button(id="note" + count)
+          - count++;
+          - j++
+        - i++
+
+    div(class='gridstylehidden' id='grid3')
+      - var i = 0, j = 0;
+      while i < 16
+        - j = 0
+        while j < 16
+          button(id="note" + count)
+          - count++;
+          - j++
+        - i++
+
+    div(class='gridstylehidden' id='grid4')
+      - var i = 0, j = 0;
       while i < 16
         - j = 0
         while j < 16
@@ -20,10 +55,12 @@ block content
         - i++
 
     div(id='controls')
-      button(id='savebutton')
-        ion-icon(name="save-outline")
+      button(id='playbackbutton')
+        ion-icon(name="pause-outline" id='playbackionbutton')
       button(id='clearbutton')
         ion-icon(name="trash-outline")
+      button(id='savebutton')
+        ion-icon(name="save-outline")
       button(id='waveforms')
         ion-icon(name="trash-outline")
 

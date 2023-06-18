@@ -54,7 +54,7 @@ a {
   transform: translate(-50%, -50%);
 }
 
-#grid {
+.gridstyle {
   align-items: center;
   display: grid;
   justify-content: center;
@@ -65,7 +65,11 @@ a {
   max-width: 25em;
 }
 
-#grid button {
+.gridstylehidden {
+  display: none;
+}
+
+.gridstyle button {
   font-family: 'VT323', monospace !important;
   text-align: right;
   height: 2em;
@@ -76,7 +80,7 @@ a {
   border-style: solid;
 }
 
-#grid button:hover {
+.gridstyle button:hover {
   background-color: #2f2f2f;
 }
 
@@ -113,13 +117,6 @@ a {
   border-color: #2f2f2f !important;
   border-width: 2px;
 }
-
-/*.playing.squareTile,*/
-/*.playing.sawtoothTile,*/
-/*.playing.triangleTile,*/
-/*.playing.sineTile {*/
-/*  background-size: 1em !important;*/
-/*}*/
 
 #controls {
   margin-top: 1.5em;
@@ -183,6 +180,40 @@ a {
 
 .emptytab {
   background-color: #000000;
+}
+
+#layers {
+  top: 50%;
+  left: -20%;
+  /*margin-right: -20%;*/
+  transform: translate(-50%, -50%);
+  align-items: center;
+  display: grid;
+  position: absolute;
+  justify-content: left;
+  align-content: center;
+  /*grid-template-columns: repeat(1, 1em);*/
+  gap: 0em;
+  /*grid-auto-rows: minmax(0em, 0em);*/
+  /*max-width: 25em;*/
+}
+
+.layerbutton {
+  font-family: 'VT323', monospace !important;
+  text-align: center;
+  background-color: #0f0f0f;
+  color: var(--foreground);
+  /* border-style: none; */
+  border-color: #1f1f1f00;
+  height: 5em;
+  /*width: 5em;*/
+  opacity: 50%;
+  transition: opacity 0.3s;
+}
+
+.layerbutton:hover {
+  opacity: 100%;
+  cursor: pointer;
 }
 
 /* #menuButton {

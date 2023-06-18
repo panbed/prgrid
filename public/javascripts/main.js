@@ -49,8 +49,6 @@ function playNote(freq, vol, waveform, startTime, stopTime) {
         //g.gain.setValueAtTime(1, stopTime - 0.25);
         //g.gain.linearRampToValueAtTime(0, stopTime);
     }
-
-
 }
 
 // set a note to be active, 1 arg for just the notenum, 2 for notenum + waveform
@@ -83,7 +81,6 @@ function makeNoteActive() {
             noteSelector.addClass('triangleTile');
             break;
     }
-
 }
 
 function createNote(row, noteNum) {
@@ -113,23 +110,62 @@ function createNote(row, noteNum) {
 }
 
 function clearNotes() {
-    $('div#grid').children().removeClass('live');
+    $('div#grid' + currentLayer).children().removeClass('live');
     // $('div#grid').children().text("");
-    $('div#grid').children().removeClass('squareTile sineTile sawtoothTile triangleTile');
+    $('div#grid' + currentLayer).children().removeClass('squareTile sineTile sawtoothTile triangleTile');
 
     selectedNotes = [];
 }
 
 let currentTab = 1;         // set the current tab and default (1)
-let selectedNotes = [];       // notes that are 'lit up' on the board, none by default
+let currentLayer = 1;
+let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
+let visibleNotes = [];
 let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
 let vol = 0.3;              // volume var, can set default here
+let paused = false;         //
+let columnOffset = 0;       // current playing column
+let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
+let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
+let layerIndex = 0;
+
+function notePlayer() {
+    visibleOffset = (currentLayer - 1) * 256;
+    // reset position once we reach the end
+    if (columnOffset > 15) columnOffset = 0;
+
+    while (layerIndex < 4) {
+        for (let i = 0; i <= 15; i++) {
+            // add notes to show that they are being played (its just a css property)
+            activeNotes.push((columnOffset + (i * 16) + visibleOffset));
+
+            // play the note if it has the live class
+            if ($('#note' + (columnOffset + (layerIndex * 256) + (i * 16))).hasClass('live')) {
+                playNote(pitches[15 - i], vol, $('#note' + (columnOffset  + (layerIndex * 256) + (i * 16))).data('waveform'), c.currentTime, c.currentTime + 0.150);
+            }
+        }
+        layerIndex++;
+    }
+
+    // run through the entire grid and add the playing class to it (denotes css property)
+    for (let j = 0; j < 1024; j++) {
+        if (activeNotes.includes(j)) {
+            $('#note' + j).addClass('playing');
+        }
+        else {
+            $('#note' + j).removeClass('playing');
+        }
+    }
+    columnOffset++;     // increment the current column
+    activeNotes = [];   // reset the active notes, since we moved to the next column
+    layerIndex = 0;
+}
 
 function exportNotes() {
     let exportedNotes = "";
     let currentNoteWaveform = "";
     for (let i = 0; i < selectedNotes.length; i++) {
-        currentNoteWaveform = $('#note' + selectedNotes[i]).data('waveform'); 
+        currentNoteWaveform = $('#note' + selectedNotes[i]).data('waveform');
         exportedNotes = exportedNotes.concat(selectedNotes[i] + ',' + currentNoteWaveform + ':');
     }
     exportedNotes = exportedNotes.concat('X');
@@ -163,7 +199,8 @@ function loadNotes(noteString) {
 
 function changeTab(tab) {
     currentTab = tab;                                           // set global currentTab to new tab
-    clearNotes();                                               // clear all notes on grid currently
+    // TODO: FIX CHANGING TABS RIGHT AWAY I HAVE TO BE RIGHT BACK OOOOOOOPS
+    clearNotes(); // clear al all notes on grid currently
     loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
 
     for (let i = 1; i <= 3; i++) {
@@ -181,12 +218,30 @@ function changeTab(tab) {
     }
 }
 
+function changeLayer(layer) {
+    currentLayer = layer;
+    for (let i = 1; i <= 4; i++) {
+        if (i != layer) {
+            $('#grid' + i).removeClass('gridstyle');
+            $('#grid' + i).addClass('gridstylehidden');
+        }
+    }
+
+    $('#grid' + layer).removeClass('gridstylehidden');
+    $('#grid' + layer).addClass('gridstyle');
+
+
+}
+
 $(function() {
     // create all the notes on the board
     let noteNum = 0;
-    for (let row = 15; row >= 0; row--)
-        for (let column = 15; column >= 0; column--)
-            createNote(row, noteNum++);
+    while (noteNum < 1024) {
+        for (let row = 15; row >= 0; row--)
+            for (let column = 15; column >= 0; column--)
+                createNote(row, noteNum++);
+    }
+
     
     // slice the waveforms text to only 3 chars
     // $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
@@ -206,6 +261,16 @@ $(function() {
     $('#clearbutton').on('click', function() {
         clearNotes();
     });
+
+    $('#playbackbutton').on('click', function() {
+        paused = !paused;
+        if (paused) {
+            $('#playbackionbutton').attr('name', 'play-outline')
+        }
+        else {
+            $('#playbackionbutton').attr('name', 'pause-outline')
+        }
+    })
 
 
     // if the data doesnt exist then it breaks, so we initialize it
@@ -233,7 +298,7 @@ $(function() {
         console.log("Copied text to clipboard!");
     });
 
-    $('#grid, #clearbutton, #loadbutton').on('click', function() {
+    $('#main, #clearbutton, #loadbutton').on('click', function() {
         switch (currentTab) {
             case 1:
                 localStorage.setItem('tab1data', exportNotes());
@@ -282,36 +347,17 @@ $(function() {
     $('#tab2').on('click', function() {changeTab(2);});
     $('#tab3').on('click', function() {changeTab(3);});
 
-    let columnOffset = 0;
-    let activeNotes = [];   // notes that are highlighted by the omnipresent moving bar
+    $('#layer1').on('click', function() {changeLayer(1);});
+    $('#layer2').on('click', function() {changeLayer(2);});
+    $('#layer3').on('click', function() {changeLayer(3);});
+    $('#layer4').on('click', function() {changeLayer(4);});
+
     let time = 150;
     // logic for the 'active' line that plays notes
     setInterval(function() {
-        // reset position once we reach the end
-        if (columnOffset > 15) columnOffset = 0;
-
-        for (let i = 0; i <= 15; i++) {
-            // add the note num to the 'currently playing' (activeNotes) array
-            activeNotes.push((columnOffset + (i * 16)));
-
-            // play the note if it has the live class
-            if ($('#note' + (columnOffset + (i * 16))).hasClass('live')) {
-                playNote(pitches[15 - i], vol, $('#note' + (columnOffset + (i * 16))).data('waveform'), c.currentTime, c.currentTime + 0.150);
-            }
+        if (!paused) {
+            notePlayer();
         }
-
-        // run through the entire grid and add the playing class to it (denotes css property)
-        for (let j = 0; j < 255; j++) {
-            if (activeNotes.includes(j)) {
-                $('#note' + j).addClass('playing');
-            }
-            else {
-                $('#note' + j).removeClass('playing');
-            }
-        }
-        columnOffset++;     // increment the current column
-        activeNotes = [];   // reset the active notes, since we moved to the next column
-        console.log(selectedNotes);
     }, time);
 
 });
