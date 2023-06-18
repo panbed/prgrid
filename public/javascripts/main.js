@@ -174,7 +174,7 @@ $(function() {
     });
 
 
-    // if the data doesnt exist then it breaks
+    // if the data doesnt exist then it breaks, so we initialize it
     if (localStorage.getItem('tab1data') == null) {
         localStorage.setItem('tab1data', "X");
         localStorage.setItem('tab2data', "X");
