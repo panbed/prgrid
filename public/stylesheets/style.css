@@ -82,6 +82,8 @@ a {
 
 .live {
   background-color: var(--foreground) !important;
+  background-repeat: no-repeat;
+  background-position: center;
   border-color: #ffffff !important;
 }
 
@@ -89,22 +91,43 @@ a {
   background-color: #dfdfdf !important;
 }
 
+.squareTile {
+  background-image: url('../assets/icons/black/square.png');
+}
+.sineTile {
+  background-image: url('../assets/icons/black/sine.png');
+}
+.triangleTile {
+  background-image: url('../assets/icons/black/triangle.png');
+}
+.sawtoothTile {
+  background-image: url('../assets/icons/black/sawtooth.png');
+}
+
 .playing {
   border-color: #4f4f4f !important;
+  background-size: 1em !important;
 }
 
 .live.playing {
   border-color: #2f2f2f !important;
-  border-width: 5px;
+  border-width: 2px;
 }
 
+/*.playing.squareTile,*/
+/*.playing.sawtoothTile,*/
+/*.playing.triangleTile,*/
+/*.playing.sineTile {*/
+/*  background-size: 1em !important;*/
+/*}*/
+
 #controls {
-  margin-top: 2em;
+  margin-top: 1.5em;
   text-align: center;
 }
 
 #controls button {
-  background-color: #00000000;
+  background-color: var(--background);
   color: var(--foreground);
   border-style: none;
   padding: 0.75em 2.75em 0.75em 2.75em;
@@ -112,17 +135,18 @@ a {
   transition: opacity 0.3s;
 }
 
-#controls i {
+#controls ion-icon {
   font-size: 1.5em;
+  -webkit-text-stroke: 0.5px white;
 }
 
 #controls #waveforms {
   font-family: 'VT323', monospace !important;
-  /*background-image: url('../img/square.png') !important;*/
-  /*background-repeat: no-repeat;*/
-  /*background-position: center;*/
-  font-size: 1.5em;
-  /*color: #ffffff00;*/
+  background-image: url('../assets/icons/white/square.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #ffffff00;
+  text-align: right;
 }
 
 #controls button:hover {

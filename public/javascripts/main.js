@@ -24,52 +24,84 @@ const pitches = [
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
 var o, g = null;
-
 function playNote(freq, vol, waveform, startTime, stopTime) {
     o = c.createOscillator();
     g = c.createGain();
-    o.type = waveform;
-    //o.connect(c.destination);
-    //g.connect(c.destination);
-    o.connect(g);
-    g.connect(c.destination);
-    o.frequency.value = freq;
-    g.gain.value = vol;
-    //g.gain.setValueAtTime(1, c.currentTime);
-    o.start(startTime);
-    //g.gain.setTargetAtTime(0, c.currentTime, 0.015);
-    o.stop(stopTime);
-    //g.gain.setValueAtTime(1, stopTime - 0.25);
-    //g.gain.linearRampToValueAtTime(0, stopTime);
+    if (c.state == 'suspended') {
+        // try fixing an issue that will create a loud noise when audiocontext is blocked
+        // probably inefficient? but it saves my ears :-)
+        // console.log('audiocontext suspended');
+        c.resume();
+        // g.gain.value = 0;
+    }
+    else {
+        o.type = waveform;
+        //o.connect(c.destination);
+        //g.connect(c.destination);
+        o.connect(g);
+        g.connect(c.destination);
+        o.frequency.value = freq;
+        g.gain.value = vol;
+        //g.gain.setValueAtTime(1, c.currentTime);
+        o.start(startTime);
+        //g.gain.setTargetAtTime(0, c.currentTime, 0.015);
+        o.stop(stopTime);
+        //g.gain.setValueAtTime(1, stopTime - 0.25);
+        //g.gain.linearRampToValueAtTime(0, stopTime);
+    }
+
+
 }
 
 // set a note to be active, 1 arg for just the notenum, 2 for notenum + waveform
 function makeNoteActive() {
     let noteNum = arguments[0];
     let noteWaveform = "";
+    let noteSelector = $('#note' + noteNum);
     if (arguments.length == 1) {
         noteWaveform = waveforms[currentwaveForm];
     }
     else if (arguments.length == 2) {
         noteWaveform = arguments[1];
     }
-    $('#note' + noteNum).data('waveform', noteWaveform);
-    selectedNotes.push(noteNum);
-    $('#note' + noteNum).addClass('live');
-    $('#note' + noteNum).text(noteWaveform.slice(0,3));
+    noteSelector.data('waveform', noteWaveform);
+    selectedNotes.push('' + noteNum);
+    noteSelector.addClass('live');
+    // $('#note' + noteNum).text(noteWaveform.slice(0,3));
+    // $('#note' + noteNum).css('background-image', 'url(\'../assets/icons/black/square.png\')');
+    switch (noteWaveform) {
+        case 'square':
+            noteSelector.addClass('squareTile');
+            break;
+        case 'sine':
+            noteSelector.addClass('sineTile');
+            break;
+        case 'sawtooth':
+            noteSelector.addClass('sawtoothTile');
+            break;
+        case 'triangle':
+            noteSelector.addClass('triangleTile');
+            break;
+    }
+
 }
 
 function createNote(row, noteNum) {
     // add num of note (0-255) & waveform to the data of note
-    $('#note' + noteNum).data('noteNum', noteNum);
-    $('#note' + noteNum).data('waveform', waveforms[currentwaveForm]);
+    let noteSelector = $('#note' + noteNum);
+    noteSelector.data('noteNum', noteNum);
+    noteSelector.data('waveform', waveforms[currentwaveForm]);
 
-    $('#note' + noteNum).on('click', function() {
+    noteSelector.on('click', function() {
         // if the note is active, then remove the live class from it and 'reset' it
         if ($(this).hasClass('live')) {
-            selectedNotes.splice(selectedNotes.indexOf(noteNum), 1);
+            // selectedNotes.splice(selectedNotes.indexOf(noteNum), 1);
+            for (let i = selectedNotes.length; i--;) {
+                if (selectedNotes[i] == noteNum) selectedNotes.splice(i, 1);
+            }
             $(this).removeClass('live');
-            $(this).text("");
+            // $(this).text("");
+            $(this).removeClass('squareTile sineTile sawtoothTile triangleTile');
         }
         // else just make it active and then play a note sample
         else {
@@ -82,14 +114,16 @@ function createNote(row, noteNum) {
 
 function clearNotes() {
     $('div#grid').children().removeClass('live');
-    $('div#grid').children().text("");
+    // $('div#grid').children().text("");
+    $('div#grid').children().removeClass('squareTile sineTile sawtoothTile triangleTile');
+
     selectedNotes = [];
 }
 
-var currentTab = 1;         // set the current tab and default (1)
-var selectedNotes = [];     // notes that are 'lit up' on the board, none by default
-var currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
-var vol = 0.3;              // volume var, can set default here
+let currentTab = 1;         // set the current tab and default (1)
+let selectedNotes = [];       // notes that are 'lit up' on the board, none by default
+let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
+let vol = 0.3;              // volume var, can set default here
 
 function exportNotes() {
     let exportedNotes = "";
@@ -109,12 +143,12 @@ function loadNotes(noteString) {
     // loop that reads the string
     for (let i = 0; i < noteString.length; i++) {
         if (noteString[i] == 'X') break; // leave if we reach an X (end of string)
-        while (noteString[i] != ',') { // read the first data, the note num
+        while (noteString[i] !== ',') { // read the first data, the note num
             currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
         }
         i++; // this fixes things :-) (it skips the ',' in the number before the next while loop)
 
-        while (noteString[i] != ':') { // reads the waveform for the number
+        while (noteString[i] !== ':') { // reads the waveform for the number
             currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
         }
 
@@ -124,7 +158,6 @@ function loadNotes(noteString) {
         // reset note num and waveform
         currentNoteString = "";
         currentNoteWaveform = "";
-
     }
 }
 
@@ -132,7 +165,6 @@ function changeTab(tab) {
     currentTab = tab;                                           // set global currentTab to new tab
     clearNotes();                                               // clear all notes on grid currently
     loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
-
 
     for (let i = 1; i <= 3; i++) {
         // change color of tab if its active
@@ -150,9 +182,6 @@ function changeTab(tab) {
 }
 
 $(function() {
-    let columnOffset = 0;
-    let activeNotes = [];   // notes that are currently playing
-
     // create all the notes on the board
     let noteNum = 0;
     for (let row = 15; row >= 0; row--)
@@ -160,7 +189,12 @@ $(function() {
             createNote(row, noteNum++);
     
     // slice the waveforms text to only 3 chars
-    $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
+    // $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
+
+    // todo: add pause feature, maybe tie in with the suspended stuff
+    if (c.state == 'suspended') {
+        console.log('audiocontext is suspended, click anywhere to attempt to resume it...');
+    }
 
     // toggling the menu button in jquery with a cool(tm) animation
     $('#menuButton').on('click', function() {
@@ -222,8 +256,23 @@ $(function() {
         if (currentwaveForm > 3) 
             currentwaveForm = 0;
 
+        switch (currentwaveForm) {
+            case 0: // square
+                $(this).css('background-image', 'url(\'../assets/icons/white/square.png\')');
+                break;
+            case 1: // saw
+                $(this).css('background-image', 'url(\'../assets/icons/white/sawtooth.png\')');
+                break;
+            case 2: // sine
+                $(this).css('background-image', 'url(\'../assets/icons/white/sine.png\')');
+                break;
+            case 3: // triangle
+                $(this).css('background-image', 'url(\'../assets/icons/white/triangle.png\')');
+                break;
+        }
+
         // display only 4 chars of waveform text, and play an example waveform when cycling through
-        $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
+        // $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
         playNote(pitches[10], vol, waveforms[currentwaveForm], c.currentTime, c.currentTime + 0.5);
 
     });
@@ -233,6 +282,9 @@ $(function() {
     $('#tab2').on('click', function() {changeTab(2);});
     $('#tab3').on('click', function() {changeTab(3);});
 
+    let columnOffset = 0;
+    let activeNotes = [];   // notes that are highlighted by the omnipresent moving bar
+    let time = 150;
     // logic for the 'active' line that plays notes
     setInterval(function() {
         // reset position once we reach the end
@@ -241,14 +293,14 @@ $(function() {
         for (let i = 0; i <= 15; i++) {
             // add the note num to the 'currently playing' (activeNotes) array
             activeNotes.push((columnOffset + (i * 16)));
-            
+
             // play the note if it has the live class
             if ($('#note' + (columnOffset + (i * 16))).hasClass('live')) {
                 playNote(pitches[15 - i], vol, $('#note' + (columnOffset + (i * 16))).data('waveform'), c.currentTime, c.currentTime + 0.150);
             }
         }
 
-        // run through the entire grid and add the playing class to it
+        // run through the entire grid and add the playing class to it (denotes css property)
         for (let j = 0; j < 255; j++) {
             if (activeNotes.includes(j)) {
                 $('#note' + j).addClass('playing');
@@ -257,9 +309,9 @@ $(function() {
                 $('#note' + j).removeClass('playing');
             }
         }
-        
         columnOffset++;     // increment the current column
         activeNotes = [];   // reset the active notes, since we moved to the next column
-    }, 150);
+        console.log(selectedNotes);
+    }, time);
 
 });
