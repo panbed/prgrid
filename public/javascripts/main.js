@@ -143,12 +143,12 @@ function loadNotes(noteString) {
     // loop that reads the string
     for (let i = 0; i < noteString.length; i++) {
         if (noteString[i] == 'X') break; // leave if we reach an X (end of string)
-        while (noteString[i] !== ',') { // read the first data, the note num
+        while (noteString[i] != ',') { // read the first data, the note num
             currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
         }
         i++; // this fixes things :-) (it skips the ',' in the number before the next while loop)
 
-        while (noteString[i] !== ':') { // reads the waveform for the number
+        while (noteString[i] != ':') { // reads the waveform for the number
             currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
         }
 
