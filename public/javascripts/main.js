@@ -21,8 +21,6 @@ const pitches = [
 // i think i saw something with logarithms but ummm unfortunately
 // i am not the best at math
 
-// todo: (kind of unnecessary but itll look cool) maybe like for the layers light it up when its playing a note
-
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
 var o, g = null;
