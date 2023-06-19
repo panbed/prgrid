@@ -45,12 +45,12 @@ a {
   border-color: #2f2f2f;
   z-index: 95;
 }
-
+/*todo: maybe fix centering, for some reason its literally off by like 10 pixels idk why*/
 #main {
   position: absolute;
   top: 50%;
-  left: 50%;
-  margin-right: -50%;
+  left: 51%;
+  margin-right: -20%;
   transform: translate(-50%, -50%);
 }
 
@@ -179,7 +179,7 @@ a {
 }
 
 .emptytab {
-  background-color: #000000;
+  background-color: #000000 !important;
 }
 
 #layers {
@@ -192,6 +192,7 @@ a {
   position: absolute;
   justify-content: left;
   align-content: center;
+
   /*grid-template-columns: repeat(1, 1em);*/
   gap: 0em;
   /*grid-auto-rows: minmax(0em, 0em);*/
@@ -208,12 +209,17 @@ a {
   height: 5em;
   /*width: 5em;*/
   opacity: 50%;
-  transition: opacity 0.3s;
+  transition: all 0.3s;
 }
 
 .layerbutton:hover {
   opacity: 100%;
   cursor: pointer;
+}
+
+.layerlit {
+  background-color: var(--foreground) !important;
+  color: var(--background) !important;
 }
 
 /* #menuButton {

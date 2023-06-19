@@ -3,16 +3,17 @@ extends layout
 block content
   div(id='main')
     div(id='tabs')
-      button(class='tabbutton' id='tab1') 1
-      button(class='tabbutton' id='tab2') 2
-      button(class='tabbutton' id='tab3') 3
+      button(class='tabbutton' id='tab1') a
+      button(class='tabbutton' id='tab2') b
+      button(class='tabbutton' id='tab3') c
 
     div(id='layers')
-      button(class='layerbutton' id='layer1') a
-      button(class='layerbutton' id='layer2') b
-      button(class='layerbutton' id='layer3') c
-      button(class='layerbutton' id='layer4') d
+      button(class='layerbutton' id='layer1') 1
+      button(class='layerbutton' id='layer2') 2
+      button(class='layerbutton' id='layer3') 3
+      button(class='layerbutton' id='layer4') 4
 
+    //  is this bad? yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     - var count = 0;
     div(class='gridstyle' id='grid1')
       - var i = 0, j = 0

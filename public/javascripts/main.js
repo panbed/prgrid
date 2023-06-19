@@ -21,6 +21,8 @@ const pitches = [
 // i think i saw something with logarithms but ummm unfortunately
 // i am not the best at math
 
+// todo: (kind of unnecessary but itll look cool) maybe like for the layers light it up when its playing a note
+
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
 var o, g = null;
@@ -109,30 +111,66 @@ function createNote(row, noteNum) {
     });
 }
 
-function clearNotes() {
-    $('div#grid' + currentLayer).children().removeClass('live');
-    // $('div#grid').children().text("");
-    $('div#grid' + currentLayer).children().removeClass('squareTile sineTile sawtoothTile triangleTile');
 
-    selectedNotes = [];
-}
 
 let currentTab = 1;         // set the current tab and default (1)
 let currentLayer = 1;
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
-let visibleNotes = [];
+// let visibleNotes = [];      // i forgot what this does to be honest
 let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
 let vol = 0.3;              // volume var, can set default here
-let paused = false;         //
+let paused = false;         // playing by default, can pause playback by setting to false
 let columnOffset = 0;       // current playing column
 let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
 let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
 let layerIndex = 0;
+let activeLayers = [];
+
+function localStorageExporter(currentTab) {
+    switch (currentTab) {
+        case 1:
+            localStorage.setItem('tab1data', exportNotes());
+            break;
+        case 2:
+            localStorage.setItem('tab2data', exportNotes());
+            break;
+        case 3:
+            localStorage.setItem('tab3data', exportNotes());
+            break;
+    }
+}
+
+function clearNotes() {
+    if (arguments[0] == 'cool') { // delete only the current layer's notes instead of everything
+        // console.log('WARNING :  ACTIVATING COOL MODE ........ WEEEEEEWOOOOOWEEEEWOOOOOOOOO [ COOL ACTIVATEING ]');
+
+        $('div#grid' + currentLayer).children().removeClass('live squareTile sineTile sawtoothTile triangleTile');
+
+        for (let i = (256 * (currentLayer - 1)); i < (256 * currentLayer); i++) {
+            // console.log('deleting: ' + i);
+            // remove the note from selectednotes so we can export it
+            selectedNotes = selectedNotes.filter(e => e !== ('' + i));
+            // console.log(selectedNotes);
+        }
+    }
+    else {
+        for (let i = 1; i <= 4; i++) {
+            // $('div#grid' + i).children().removeClass('live');
+            $('div#grid' + i).children().removeClass('live squareTile sineTile sawtoothTile triangleTile');
+        }
+        selectedNotes = [];
+    }
+}
 
 function notePlayer() {
     visibleOffset = (currentLayer - 1) * 256;
     // reset position once we reach the end
     if (columnOffset > 15) columnOffset = 0;
+
+    // reset layer lit
+    for (let i = 1; i <= 4; i++) {
+        $('#layer' + i).removeClass('layerlit');
+    }
 
     while (layerIndex < 4) {
         for (let i = 0; i <= 15; i++) {
@@ -142,7 +180,9 @@ function notePlayer() {
             // play the note if it has the live class
             if ($('#note' + (columnOffset + (layerIndex * 256) + (i * 16))).hasClass('live')) {
                 playNote(pitches[15 - i], vol, $('#note' + (columnOffset  + (layerIndex * 256) + (i * 16))).data('waveform'), c.currentTime, c.currentTime + 0.150);
+                activeLayers.push(layerIndex + 1);
             }
+
         }
         layerIndex++;
     }
@@ -156,9 +196,22 @@ function notePlayer() {
             $('#note' + j).removeClass('playing');
         }
     }
+
+    // make layer button lit up if its currently playing something
+    for (let i = 1; i <= 4; i++) {
+        if (activeLayers.includes(i)) {
+            $('#layer' + i).addClass('layerlit');
+        }
+    }
+
+    // for (let i = 0; i < 4; i++) {
+    //     $('layer' + (i + 1)).removeClass('layerlit');
+    // }
+
     columnOffset++;     // increment the current column
     activeNotes = [];   // reset the active notes, since we moved to the next column
     layerIndex = 0;
+    activeLayers = [];
 }
 
 function exportNotes() {
@@ -199,8 +252,7 @@ function loadNotes(noteString) {
 
 function changeTab(tab) {
     currentTab = tab;                                           // set global currentTab to new tab
-    // TODO: FIX CHANGING TABS RIGHT AWAY I HAVE TO BE RIGHT BACK OOOOOOOPS
-    clearNotes(); // clear al all notes on grid currently
+    clearNotes();                                               // clear all notes on grid currently
     loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
 
     for (let i = 1; i <= 3; i++) {
@@ -216,6 +268,7 @@ function changeTab(tab) {
         else
             $('#tab' + i).removeClass('emptytab');
     }
+    changeLayer(currentLayer); // update layer information for the empty/full thing
 }
 
 function changeLayer(layer) {
@@ -224,13 +277,32 @@ function changeLayer(layer) {
         if (i != layer) {
             $('#grid' + i).removeClass('gridstyle');
             $('#grid' + i).addClass('gridstylehidden');
+            $('#layer' + i).removeClass('activetab');
+            $('#layer' + i).addClass('emptytab');
+        }
+    }
+
+    // go through the notes that will be played and determine if the layer is empty or not
+    // maybe this is a little unnecessary for just a little visual feature (its really unnecessary)
+    for (let i = 0; i < selectedNotes.length; i++) {
+        if (selectedNotes[i] >= 0 && selectedNotes[i] < 256) {
+            $('#layer1').removeClass('emptytab');
+        }
+        else if (selectedNotes[i] >= 256 && selectedNotes[i] < 512) {
+            $('#layer2').removeClass('emptytab');
+        }
+        else if (selectedNotes[i] >= 512 && selectedNotes[i] < 768) {
+            $('#layer3').removeClass('emptytab');
+        }
+        else if (selectedNotes[i] >= 768 && selectedNotes[i] < 1024) {
+            $('#layer4').removeClass('emptytab');
         }
     }
 
     $('#grid' + layer).removeClass('gridstylehidden');
     $('#grid' + layer).addClass('gridstyle');
-
-
+    $('#layer' + layer).removeClass('emptytab');
+    $('#layer' + layer).addClass('activetab');
 }
 
 $(function() {
@@ -242,11 +314,6 @@ $(function() {
                 createNote(row, noteNum++);
     }
 
-    
-    // slice the waveforms text to only 3 chars
-    // $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
-
-    // todo: add pause feature, maybe tie in with the suspended stuff
     if (c.state == 'suspended') {
         console.log('audiocontext is suspended, click anywhere to attempt to resume it...');
     }
@@ -259,7 +326,7 @@ $(function() {
     // clear button logic: remove anything that is active ('live'),
     // reset any text on the notes, and then remove any selected notes
     $('#clearbutton').on('click', function() {
-        clearNotes();
+        clearNotes('cool');
     });
 
     $('#playbackbutton').on('click', function() {
@@ -272,7 +339,6 @@ $(function() {
         }
     })
 
-
     // if the data doesnt exist then it breaks, so we initialize it
     if (localStorage.getItem('tab1data') == null) {
         localStorage.setItem('tab1data', "X");
@@ -281,6 +347,7 @@ $(function() {
     }
     // set the default tab to 1
     changeTab(1);
+    changeLayer(1);
 
     // logic for volume slider
     $('#volume').on('input', function() {
@@ -298,18 +365,10 @@ $(function() {
         console.log("Copied text to clipboard!");
     });
 
-    $('#main, #clearbutton, #loadbutton').on('click', function() {
-        switch (currentTab) {
-            case 1:
-                localStorage.setItem('tab1data', exportNotes());
-                break;
-            case 2:
-                localStorage.setItem('tab2data', exportNotes());
-                break;
-            case 3:
-                localStorage.setItem('tab3data', exportNotes());
-                break;
-        }
+    // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
+    // from being empty to full (maybe just be lazy and add changelayer(currentlayer) or something idk)
+    $('#main, #loadbutton, #clearbutton').on('click', function() {
+        localStorageExporter(currentTab);
     });
 
     // logic for the waveform button, displays the current waveform text
@@ -342,7 +401,7 @@ $(function() {
 
     });
 
-    // amazing tab logic :3 (im so sorry)
+    // amazing tab AND layer logic :3 (im so sorry)
     $('#tab1').on('click', function() {changeTab(1);});
     $('#tab2').on('click', function() {changeTab(2);});
     $('#tab3').on('click', function() {changeTab(3);});
