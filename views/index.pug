@@ -2,16 +2,21 @@ extends layout
 
 block content
   div(id='main')
+
+    // wait why am i doing all of this in pug anyways
     div(id='tabs')
+      // todo: originally i wanted to make it so that you could add more tabs but eh
       button(class='tabbutton' id='tab1') a
       button(class='tabbutton' id='tab2') b
       button(class='tabbutton' id='tab3') c
+      button(class='tabbutton' id='tab4') d
 
     div(id='layers')
       button(class='layerbutton' id='layer1') 1
       button(class='layerbutton' id='layer2') 2
       button(class='layerbutton' id='layer3') 3
       button(class='layerbutton' id='layer4') 4
+
 
     //  is this bad? yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     - var count = 0;

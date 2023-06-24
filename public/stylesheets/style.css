@@ -78,6 +78,8 @@ a {
   background-color: var(--background);
   border-color: #2f2f2f;
   border-style: solid;
+  /* this adds a bit of cpu time idk if its worth it but it makes it feel slightly nicer */
+  transition: all 0.2s;
 }
 
 .gridstyle button:hover {
@@ -161,7 +163,6 @@ a {
   text-align: center;
   background-color: #0f0f0f;
   color: var(--foreground);
-  /* border-style: none; */
   border-color: #1f1f1f00;
   height: 2em;
   width: 5em;
@@ -174,11 +175,20 @@ a {
   cursor: pointer;
 }
 
+/* sorry */
 .activetab {
-  background-color: #1f1f1f !important; 
+  background-color: #1f1f1f !important;
 }
 
 .emptytab {
+  background-color: #000000;
+}
+
+.activelayer {
+  background-color: #1f1f1f !important;
+}
+
+.emptylayer {
   background-color: #000000 !important;
 }
 
@@ -192,24 +202,19 @@ a {
   position: absolute;
   justify-content: left;
   align-content: center;
-
-  /*grid-template-columns: repeat(1, 1em);*/
   gap: 0em;
-  /*grid-auto-rows: minmax(0em, 0em);*/
-  /*max-width: 25em;*/
+
 }
 
 .layerbutton {
   font-family: 'VT323', monospace !important;
   text-align: center;
-  background-color: #0f0f0f;
   color: var(--foreground);
-  /* border-style: none; */
   border-color: #1f1f1f00;
   height: 5em;
-  /*width: 5em;*/
   opacity: 50%;
   transition: all 0.3s;
+  background-color: #0f0f0f;
 }
 
 .layerbutton:hover {
@@ -219,21 +224,5 @@ a {
 
 .layerlit {
   background-color: var(--foreground) !important;
-  color: var(--background) !important;
+  color: var(--background);
 }
-
-/* #menuButton {
-  position: absolute;
-  background-color: #00000000;
-  color: var(--foreground);
-  border-style: none;
-  padding: 0.75em 0.75em 0.75em 0.75em;
-  opacity: 15%;
-  transition: opacity 0.3s;
-  z-index: 100;
-}
-
-#menuButton:hover {
-  opacity: 100%;
-  cursor: pointer;
-} */

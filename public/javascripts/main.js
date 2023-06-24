@@ -1,3 +1,10 @@
+/*
+TODO: the long list
+- make actually decent menu ui, its really bad right now
+- add some way to change scale (maybe just happy/sad, and a pitch that just adds a num to every pitch hz)
+- make sounds less crunchy? i think it has to do with the commented out code in playnote about linearramp or something
+ */
+
 const pitches = [
     65.41,  // C2
     77.78,  // Eb2
@@ -15,11 +22,7 @@ const pitches = [
     392.00, // G4
     466.16, // Bb4
     523.25  // C5
-]; 
-
-// todo: mathematically generate these pitches
-// i think i saw something with logarithms but ummm unfortunately
-// i am not the best at math
+];
 
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
@@ -109,8 +112,6 @@ function createNote(row, noteNum) {
     });
 }
 
-
-
 let currentTab = 1;         // set the current tab and default (1)
 let currentLayer = 1;
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
@@ -123,19 +124,11 @@ let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1,
 let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
 let layerIndex = 0;
 let activeLayers = [];
+// let numLocalStorage = Object.keys(localStorage).length;
 
 function localStorageExporter(currentTab) {
-    switch (currentTab) {
-        case 1:
-            localStorage.setItem('tab1data', exportNotes());
-            break;
-        case 2:
-            localStorage.setItem('tab2data', exportNotes());
-            break;
-        case 3:
-            localStorage.setItem('tab3data', exportNotes());
-            break;
-    }
+    let tabString = 'tab' + currentTab + 'data';
+    localStorage.setItem(tabString, exportNotes());
 }
 
 function clearNotes() {
@@ -145,15 +138,12 @@ function clearNotes() {
         $('div#grid' + currentLayer).children().removeClass('live squareTile sineTile sawtoothTile triangleTile');
 
         for (let i = (256 * (currentLayer - 1)); i < (256 * currentLayer); i++) {
-            // console.log('deleting: ' + i);
             // remove the note from selectednotes so we can export it
             selectedNotes = selectedNotes.filter(e => e !== ('' + i));
-            // console.log(selectedNotes);
         }
     }
     else {
         for (let i = 1; i <= 4; i++) {
-            // $('div#grid' + i).children().removeClass('live');
             $('div#grid' + i).children().removeClass('live squareTile sineTile sawtoothTile triangleTile');
         }
         selectedNotes = [];
@@ -202,10 +192,6 @@ function notePlayer() {
         }
     }
 
-    // for (let i = 0; i < 4; i++) {
-    //     $('layer' + (i + 1)).removeClass('layerlit');
-    // }
-
     columnOffset++;     // increment the current column
     activeNotes = [];   // reset the active notes, since we moved to the next column
     layerIndex = 0;
@@ -233,7 +219,7 @@ function loadNotes(noteString) {
         while (noteString[i] != ',') { // read the first data, the note num
             currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
         }
-        i++; // this fixes things :-) (it skips the ',' in the number before the next while loop)
+        i++; // this fixes things :-) (it skips the ',' in the number before the next while loop i think)
 
         while (noteString[i] != ':') { // reads the waveform for the number
             currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
@@ -253,7 +239,7 @@ function changeTab(tab) {
     clearNotes();                                               // clear all notes on grid currently
     loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
 
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 4; i++) {
         // change color of tab if its active
         if (i == tab)
             $('#tab' + i).addClass('activetab');
@@ -275,8 +261,8 @@ function changeLayer(layer) {
         if (i != layer) {
             $('#grid' + i).removeClass('gridstyle');
             $('#grid' + i).addClass('gridstylehidden');
-            $('#layer' + i).removeClass('activetab');
-            $('#layer' + i).addClass('emptytab');
+            $('#layer' + i).removeClass('activelayer');
+            $('#layer' + i).addClass('emptylayer');
         }
     }
 
@@ -284,23 +270,23 @@ function changeLayer(layer) {
     // maybe this is a little unnecessary for just a little visual feature (its really unnecessary)
     for (let i = 0; i < selectedNotes.length; i++) {
         if (selectedNotes[i] >= 0 && selectedNotes[i] < 256) {
-            $('#layer1').removeClass('emptytab');
+            $('#layer1').removeClass('emptylayer');
         }
         else if (selectedNotes[i] >= 256 && selectedNotes[i] < 512) {
-            $('#layer2').removeClass('emptytab');
+            $('#layer2').removeClass('emptylayer');
         }
         else if (selectedNotes[i] >= 512 && selectedNotes[i] < 768) {
-            $('#layer3').removeClass('emptytab');
+            $('#layer3').removeClass('emptylayer');
         }
         else if (selectedNotes[i] >= 768 && selectedNotes[i] < 1024) {
-            $('#layer4').removeClass('emptytab');
+            $('#layer4').removeClass('emptylayer');
         }
     }
 
     $('#grid' + layer).removeClass('gridstylehidden');
     $('#grid' + layer).addClass('gridstyle');
-    $('#layer' + layer).removeClass('emptytab');
-    $('#layer' + layer).addClass('activetab');
+    $('#layer' + layer).removeClass('emptylayer');
+    $('#layer' + layer).addClass('activelayer');
 }
 
 $(function() {
@@ -339,11 +325,13 @@ $(function() {
 
     // if the data doesnt exist then it breaks, so we initialize it
     if (localStorage.getItem('tab1data') == null) {
-        localStorage.setItem('tab1data', "X");
-        localStorage.setItem('tab2data', "X");
-        localStorage.setItem('tab3data', "X");
+        for (let i = 1; i <= 4; i++) {
+            localStorage.setItem('tab' + i + 'data', "X");
+            // numLocalStorage++;
+        }
     }
-    // set the default tab to 1
+
+    // set the default tab and layer to 1 for refreshes i guess
     changeTab(1);
     changeLayer(1);
 
@@ -359,8 +347,7 @@ $(function() {
 
     $('#savebutton').on('click', function() {
         navigator.clipboard.writeText(exportNotes());
-        // todo: make this look cooler
-        console.log("Copied text to clipboard!");
+        console.log("Copied text to clipboard!"); // todo: make this look cooler
     });
 
     // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
@@ -394,22 +381,20 @@ $(function() {
         }
 
         // display only 4 chars of waveform text, and play an example waveform when cycling through
-        // $('#waveforms').text(waveforms[currentwaveForm].slice(0, 3));
         playNote(pitches[10], vol, waveforms[currentwaveForm], c.currentTime, c.currentTime + 0.5);
 
     });
 
-    // amazing tab AND layer logic :3 (im so sorry)
-    $('#tab1').on('click', function() {changeTab(1);});
-    $('#tab2').on('click', function() {changeTab(2);});
-    $('#tab3').on('click', function() {changeTab(3);});
+    // please dont go through the git history and see that instead of putting a for loop
+    // i put like 7 different statements for each different tab hardcoded in
+    for (let i = 1; i <= 4; i++) {
+        $('#tab' + i).on('click', function() {changeTab(i);});
+    }
+    for (let i = 1; i <= 4; i++) {
+        $('#layer' + i).on('click', function() {changeLayer(i);});
+    }
 
-    $('#layer1').on('click', function() {changeLayer(1);});
-    $('#layer2').on('click', function() {changeLayer(2);});
-    $('#layer3').on('click', function() {changeLayer(3);});
-    $('#layer4').on('click', function() {changeLayer(4);});
-
-    let time = 150;
+    let time = 250;
     // logic for the 'active' line that plays notes
     setInterval(function() {
         if (!paused) {
