@@ -5,24 +5,74 @@ TODO: the long list
 - make sounds less crunchy? i think it has to do with the commented out code in playnote about linearramp or something
  */
 
-const pitches = [
-    65.41,  // C2
-    77.78,  // Eb2
-    87.31,  // F2
-    98.00,  // G2
-    116.54, // Bb2
-    130.81, // C3
-    155.56, // Eb3
-    174.61, // F3
-    196.00, // G3
-    233.08, // Bb3
-    261.63, // C4
-    311.13, // Eb4
-    349.23, // F4
-    392.00, // G4
-    466.16, // Bb4
-    523.25  // C5
-];
+const startingHz = [
+    55.00, // a1
+    110.00, // a2
+    220.00, // a3
+    440.00, // a4
+    880.00, // a5
+    1760.00, // a6
+    3520.00, // a7
+]
+
+// set starting note to A4 (440hz)
+const startHz = startingHz[3];
+
+// const pitches = [
+//     65.41,  // C2
+//     77.78,  // Eb2
+//     87.31,  // F2
+//     98.00,  // G2
+//     116.54, // Bb2
+//     130.81, // C3
+//     155.56, // Eb3
+//     174.61, // F3
+//     196.00, // G3
+//     233.08, // Bb3
+//     261.63, // C4
+//     311.13, // Eb4
+//     349.23, // F4
+//     392.00, // G4
+//     466.16, // Bb4
+//     523.25  // C5
+// ];
+
+// pitch numbers relative to A4
+// a2, c2, d2, e2, g2, a3, c3, d3, e3, g3, a4, c4, d4, e4, g4, a5
+const minorPentatonicScale = [
+    -24,
+    -21,
+    -19,
+    -17,
+    -14,
+    -12,
+    -9,
+    -7,
+    -5,
+    -2,
+    0,
+    3,
+    5,
+    7,
+    10,
+    12
+]
+
+const pitches = [];
+// generate pitch table, starting from C0 to C8:
+function generateTable(startHz) {
+    // we use A4 (440hz) as our constant
+    // and if we want to change the octave i guess we can just change to a lower/higher A
+    let pitchHz;
+    for (let i = 0; i < 16; i++) {
+        pitchHz = (startHz * Math.pow((Math.pow(2, 1/12)), minorPentatonicScale[i])).toFixed(2);
+        pitches[i] = pitchHz;
+    }
+
+}
+
+generateTable(startHz)
+console.log(pitches)
 
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
@@ -112,12 +162,27 @@ function createNote(row, noteNum) {
     });
 }
 
+function createNotification(message) {
+    console.log(message);
+
+    $('#message').text(message);
+    $('.notification').fadeIn();
+
+    showNotification = setTimeout(() => {
+        $('.notification').fadeOut();
+    }, 2000);
+
+}
+
+
+
+
 let currentTab = 1;         // set the current tab and default (1)
 let currentLayer = 1;
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
 // let visibleNotes = [];      // i forgot what this does to be honest
 let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
-let vol = 0.3;              // volume var, can set default here
+let vol = (localStorage.getItem('volume') == null) ? 0.3 :  localStorage.getItem('volume'); // set volume with localStorage
 let paused = false;         // playing by default, can pause playback by setting to false
 let columnOffset = 0;       // current playing column
 let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
@@ -235,9 +300,9 @@ function loadNotes(noteString) {
 }
 
 function changeTab(tab) {
-    currentTab = tab;                                           // set global currentTab to new tab
-    clearNotes();                                               // clear all notes on grid currently
-    loadNotes(localStorage.getItem('tab' + tab + 'data'));  // load notes from the string saved in localstorage
+    currentTab = tab; // set global currentTab to new tab
+    clearNotes(); // clear all notes on grid currently
+    loadNotes(localStorage.getItem('tab' + tab + 'data')); // load notes from the string saved in localstorage
 
     for (let i = 1; i <= 4; i++) {
         // change color of tab if its active
@@ -310,7 +375,7 @@ $(function() {
     // clear button logic: remove anything that is active ('live'),
     // reset any text on the notes, and then remove any selected notes
     $('#clearbutton').on('click', function() {
-        clearNotes('cool');
+        clearNotes('cool'); // this is bad
     });
 
     $('#playbackbutton').on('click', function() {
@@ -338,6 +403,7 @@ $(function() {
     // logic for volume slider
     $('#volume').on('input', function() {
         vol = this.value;
+        localStorage.setItem('volume', this.value);
     });
 
     // logic for the load button and export button
@@ -347,7 +413,7 @@ $(function() {
 
     $('#savebutton').on('click', function() {
         navigator.clipboard.writeText(exportNotes());
-        console.log("Copied text to clipboard!"); // todo: make this look cooler
+        createNotification("Copied current tab information to clipboard.");
     });
 
     // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
@@ -394,7 +460,7 @@ $(function() {
         $('#layer' + i).on('click', function() {changeLayer(i);});
     }
 
-    let time = 250;
+    let time = 150;
     // logic for the 'active' line that plays notes
     setInterval(function() {
         if (!paused) {
