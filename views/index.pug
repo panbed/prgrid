@@ -78,6 +78,15 @@ block content
     p(id='message')
 
   div(id='menu' style='display: none')
+    h1 <i>prgrid</i>
+    p import song
+    input(
+      type='text'
+      id='loadtext'
+    )
+    button(id='loadbutton')
+      i(class='fa fa-upload')
+    p volume
     input(
       type='range'
       id='volume'
@@ -86,16 +95,6 @@ block content
       step='0.01'
       value='0.3'
     )
-    input(
-      type='text'
-      id='loadtext'
-    )
-    br
-    button(id='loadbutton')
-      i(class='fa fa-upload')
-    button(id='exportbutton')
-      //- p export
-      i(class='fa fa-floppy-o')
     
 
 

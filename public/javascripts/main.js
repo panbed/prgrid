@@ -18,25 +18,6 @@ const startingHz = [
 // set starting note to A4 (440hz)
 const startHz = startingHz[3];
 
-// const pitches = [
-//     65.41,  // C2
-//     77.78,  // Eb2
-//     87.31,  // F2
-//     98.00,  // G2
-//     116.54, // Bb2
-//     130.81, // C3
-//     155.56, // Eb3
-//     174.61, // F3
-//     196.00, // G3
-//     233.08, // Bb3
-//     261.63, // C4
-//     311.13, // Eb4
-//     349.23, // F4
-//     392.00, // G4
-//     466.16, // Bb4
-//     523.25  // C5
-// ];
-
 // pitch numbers relative to A4
 // a2, c2, d2, e2, g2, a3, c3, d3, e3, g3, a4, c4, d4, e4, g4, a5
 const minorPentatonicScale = [
@@ -162,20 +143,30 @@ function createNote(row, noteNum) {
     });
 }
 
+let notificationShown = 0;
+let showNotification = null;
+
 function createNotification(message) {
-    console.log(message);
+    if (showNotification != null) {
+        $('.notification').css('display', 'none');
+        clearTimeout(showNotification);
+    }
+
+
 
     $('#message').text(message);
-    $('.notification').fadeIn();
+    $('.notification').fadeIn('fast');
 
+    notificationShown = 1;
     showNotification = setTimeout(() => {
-        $('.notification').fadeOut();
+        $('.notification').fadeOut('fast');
     }, 2000);
-
 }
 
-
-
+function killNotification() {
+    $('.notification').fadeOut('fast');
+    clearTimeout(showNotification);
+}
 
 let currentTab = 1;         // set the current tab and default (1)
 let currentLayer = 1;
@@ -277,25 +268,51 @@ function exportNotes() {
 function loadNotes(noteString) {
     let currentNoteString = "";
     let currentNoteWaveform = "";
+    let valid = true;
+
+    // check if the string contains any commas or :, if it doesn't then it's probably invalid
+    if (!noteString.includes(',', ':', 'X')) {
+        valid = false;
+    }
 
     // loop that reads the string
     for (let i = 0; i < noteString.length; i++) {
-        if (noteString[i] == 'X') break; // leave if we reach an X (end of string)
-        while (noteString[i] != ',') { // read the first data, the note num
-            currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
+        if (noteString[i] == 'X' || !valid) break; // leave if we reach an X (end of string)
+
+        if (valid) {
+            while (noteString[i] != ',') { // read the first data, the note num
+                currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
+            }
+
+            // check if the note actually exists on the board - if not then the string is probably wrong
+            if (!$('#note' + currentNoteString).length) {
+                valid = false;
+                break;
+            }
+    
+            i++; // this fixes things :-) (it skips the ',' in the number before the next while loop i think)
+    
+            while (noteString[i] != ':') { // reads the waveform for the number
+                currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
+            }
+
+            if (waveforms.includes(currentNoteWaveform)) {
+                // set the note to be active
+                makeNoteActive(currentNoteString, currentNoteWaveform);
+        
+                // reset note num and waveform
+                currentNoteString = "";
+                currentNoteWaveform = "";
+            }
+            else {
+                valid = false;
+                break;
+            }
         }
-        i++; // this fixes things :-) (it skips the ',' in the number before the next while loop i think)
+    }
 
-        while (noteString[i] != ':') { // reads the waveform for the number
-            currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
-        }
-
-        // set the note to be active
-        makeNoteActive(currentNoteString, currentNoteWaveform);
-
-        // reset note num and waveform
-        currentNoteString = "";
-        currentNoteWaveform = "";
+    if (!valid) {
+        createNotification("invalid string! double check it please...")
     }
 }
 
@@ -364,12 +381,19 @@ $(function() {
     }
 
     if (c.state == 'suspended') {
-        console.log('audiocontext is suspended, click anywhere to attempt to resume it...');
+        createNotification('audiocontext is suspended, click anywhere to attempt to resume it...');
     }
+    else {
+        killNotification();
+    }
+
+    $('.notification').on('click', () => {
+        killNotification();
+    });
 
     // toggling the menu button in jquery with a cool(tm) animation
     $('#menuButton').on('click', function() {
-        $('#menu').slideToggle('fast');
+        $('#menu').fadeToggle('fast');
     })
 
     // clear button logic: remove anything that is active ('live'),
@@ -401,9 +425,13 @@ $(function() {
     changeLayer(1);
 
     // logic for volume slider
+    $('#volume').attr('value', vol);
     $('#volume').on('input', function() {
         vol = this.value;
         localStorage.setItem('volume', this.value);
+    });
+    $('#volume').on('change', function() {
+        $('#loadtext').text(vol);
     });
 
     // logic for the load button and export button
@@ -413,7 +441,7 @@ $(function() {
 
     $('#savebutton').on('click', function() {
         navigator.clipboard.writeText(exportNotes());
-        createNotification("Copied current tab information to clipboard.");
+        createNotification("copied current tab information to clipboard");
     });
 
     // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
