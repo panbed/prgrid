@@ -49,6 +49,7 @@ a {
 }
 
 #loadtext {
+  width: 85%;
   font-family: 'DotGothic16', monospace !important;
   background-color: #000000;
   border-color: #2f2f2f;
@@ -59,14 +60,18 @@ a {
 
 #loadbutton {
   font-family: 'DotGothic16', monospace !important;
-  background-color: #1f1f1f;
-  border-color: #5f5f5f;
-  border-style: solid;
+  background-color: #00000000;
+  border-style: none;
   border-radius: 5px;
   color: var(--foreground);
+  padding-left: 1.5em;
 }
 
-#volume {
+#loadbutton:hover {
+  cursor: pointer;
+}
+
+#volume, #speed {
   width: 100%;
   height: 15px;
   border-radius: 5px;  
@@ -75,7 +80,7 @@ a {
   opacity: 0.7;
 }
 
-#volume::-webkit-slider-thumb {
+#volume::-webkit-slider-thumb, #speed::-webkit-slider-thumb {
   appearance: none;
   background: #5f5f5f;
   cursor: pointer;
@@ -83,13 +88,59 @@ a {
   border-color: #00000000;
 }
 
-#volume::-moz-range-thumb {
+#volume::-moz-range-thumb, #speed::-moz-range-thumb {
   background: #5f5f5f;
   cursor: pointer;
   border-radius: 0px;
   border-color: #00000000;
 }
 
+#debugbuttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.debugbutton {
+  font-family: 'DotGothic16', monospace !important;
+  font-size: 1.5em;
+  background-color: #00000000;
+  border-style: none;
+  border-radius: 5px;
+  color: var(--foreground);
+}
+
+.debugbutton:hover {
+  cursor: pointer;
+}
+
+#pitches {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pitchbutton {
+  font-family: 'DotGothic16', monospace !important;
+  font-size: 1em;
+  background-color: #00000000;
+  border-style: none;
+  border-radius: 5px;
+  color: #5f5f5f;
+  padding-right: 1em;
+  transition: color 0.3s;
+}
+
+.pitchbutton:hover {
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.pitchbuttonselected {
+  color: var(--foreground) !important;
+}
+
+#logo {
+  text-align: center;
+}
 
 #main {
   /*todo: maybe fix centering, for some reason its literally off by like 10 pixels idk why*/
@@ -200,8 +251,9 @@ a {
 }
 
 #tabs {
-  padding: 2em;
+  padding: 2em; /* 2em */
   text-align: center;
+  margin-left: -0.850em; /* cool hardcoded manual centering (tm) */
 }
 
 .tabbutton {
@@ -211,7 +263,7 @@ a {
   color: var(--foreground);
   border-color: #1f1f1f00;
   height: 2em;
-  width: 5em;
+  width: 3em;
   opacity: 50%;
   transition: opacity 0.3s;
 }

@@ -16,7 +16,7 @@ const startingHz = [
 ]
 
 // set starting note to A4 (440hz)
-const startHz = startingHz[3];
+let startHz = startingHz[3];
 
 // pitch numbers relative to A4
 // a2, c2, d2, e2, g2, a3, c3, d3, e3, g3, a4, c4, d4, e4, g4, a5
@@ -152,8 +152,6 @@ function createNotification(message) {
         clearTimeout(showNotification);
     }
 
-
-
     $('#message').text(message);
     $('.notification').fadeIn('fast');
 
@@ -257,6 +255,10 @@ function notePlayer() {
 function exportNotes() {
     let exportedNotes = "";
     let currentNoteWaveform = "";
+    // exportedNotes = exportedNotes.concat('[' + startingHz.indexOf(startHz) + ']');
+    console.log(startingHz.indexOf(startHz) + 1);
+    exportedNotes = exportedNotes.concat('(' + (startingHz.indexOf(startHz) + 1) + ')'); // other settings (e.g speed, pitch)
+    
     for (let i = 0; i < selectedNotes.length; i++) {
         currentNoteWaveform = $('#note' + selectedNotes[i]).data('waveform');
         exportedNotes = exportedNotes.concat(selectedNotes[i] + ',' + currentNoteWaveform + ':');
@@ -268,19 +270,46 @@ function exportNotes() {
 function loadNotes(noteString) {
     let currentNoteString = "";
     let currentNoteWaveform = "";
+    let currentPitch = 4;
     let valid = true;
 
     // check if the string contains any commas or :, if it doesn't then it's probably invalid
-    if (!noteString.includes(',', ':', 'X')) {
+    if (!noteString.includes('X')) {
         valid = false;
     }
-
+    
+    // get info about speed and pitch
+    let i = 0;
+    if (noteString[0] == '(') {
+        while (noteString[i] != ')' && i < noteString.length) {
+            if (!isNaN(noteString[i])) {
+                currentPitch = parseInt(noteString[i]);
+            }
+            i++;
+        }
+    }
+    else {
+        valid = false;
+    }
+    
+    i++;
+    
     // loop that reads the string
-    for (let i = 0; i < noteString.length; i++) {
+    for (let i = 3; i < noteString.length; i++) {
         if (noteString[i] == 'X' || !valid) break; // leave if we reach an X (end of string)
 
+        if (!noteString.includes(',', ':')) {
+            valid = false;
+        }
+
         if (valid) {
-            while (noteString[i] != ',') { // read the first data, the note num
+
+
+            console.log("currently looking at:");
+            console.log(noteString[i]);
+
+
+            while (noteString[i] != ',' && i < noteString.length) { // read the first data, the note num
                 currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
             }
 
@@ -292,7 +321,7 @@ function loadNotes(noteString) {
     
             i++; // this fixes things :-) (it skips the ',' in the number before the next while loop i think)
     
-            while (noteString[i] != ':') { // reads the waveform for the number
+            while (noteString[i] != ':' && i < noteString.length) { // reads the waveform for the number
                 currentNoteWaveform = currentNoteWaveform.concat(noteString[i++]);
             }
 
@@ -311,25 +340,37 @@ function loadNotes(noteString) {
         }
     }
 
+    if (valid) {
+        changePitch(currentPitch);
+    }
+
     if (!valid) {
         createNotification("invalid string! double check it please...")
     }
 }
 
 function changeTab(tab) {
+    if (tab < 1) 
+        tab = 8;
+    else if (tab > 8) 
+        tab = 1;
+
     currentTab = tab; // set global currentTab to new tab
+    let tabData = null;
     clearNotes(); // clear all notes on grid currently
     loadNotes(localStorage.getItem('tab' + tab + 'data')); // load notes from the string saved in localstorage
 
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 8; i++) {
         // change color of tab if its active
         if (i == tab)
             $('#tab' + i).addClass('activetab');
         else
             $('#tab' + i).removeClass('activetab');
 
-        // make tab color blank if its empty
-        if (localStorage.getItem('tab' + i + 'data') == 'X')
+        // make tab color blank if its empty (blank format is something like " (4)X ")
+        tabData = localStorage.getItem('tab' + i + 'data');
+        console.log(tabData);
+        if (tabData.indexOf('X') == 3)
             $('#tab' + i).addClass('emptytab');
         else
             $('#tab' + i).removeClass('emptytab');
@@ -338,6 +379,12 @@ function changeTab(tab) {
 }
 
 function changeLayer(layer) {
+    // handle inc/dec layer number in controls
+    if (layer < 1) 
+        layer = 4;
+    else if (layer > 4) 
+        layer = 1;
+
     currentLayer = layer;
     for (let i = 1; i <= 4; i++) {
         if (i != layer) {
@@ -371,8 +418,77 @@ function changeLayer(layer) {
     $('#layer' + layer).addClass('activelayer');
 }
 
+function changePitch(pitch) {
+    if (pitch < 1) 
+        pitch = 7;
+    else if (pitch > 7) 
+        pitch = 1;
+
+    startHz = startingHz[pitch - 1];
+    generateTable(startHz);
+    localStorageExporter(currentTab);
+
+    // change color of active pitch
+    for (let i = 1; i <= 7; i++) {
+        if (startingHz[i - 1] == startHz) {
+            $('#pitch' + i).addClass('pitchbuttonselected');
+        }
+        else {
+            $('#pitch' + i).removeClass('pitchbuttonselected');
+        }
+    }
+
+
+}
+
+function togglePause() {
+    paused = !paused;
+    if (paused) {
+        $('#playbackionbutton').attr('name', 'play-outline')
+    }
+    else {
+        $('#playbackionbutton').attr('name', 'pause-outline')
+    }
+}
+
+// TODO: maybe make the layer more obvious, since when something is playing it is kind of hard to see
+function controlHandler(e) {
+    var tag = e.target.tagName.toLowerCase();
+    if (tag != 'input' && tag != 'textarea') {
+        switch (e.key) {
+            case ' ':
+                togglePause();
+                break;
+            case 'ArrowDown':
+            case 's':
+                changeLayer(++currentLayer);
+                break;
+            case 'ArrowUp':
+            case 'w':
+                changeLayer(--currentLayer);
+                break;
+            case 'ArrowLeft':
+            case 'a':
+                changeTab(--currentTab);
+                break;
+            case 'ArrowRight':
+            case 'd':
+                changeTab(++currentTab);
+                break;
+        }
+    }
+}
+
+function nukeEverything() {
+    // warning: this will, in fact, nuke everything
+    localStorage.clear();
+    location.reload();
+}
+
+// the 'big' function that will be run when the page loads
 $(function() {
     // create all the notes on the board
+    // (since theres 4 layers, and each layer has 256 notes)
     let noteNum = 0;
     while (noteNum < 1024) {
         for (let row = 15; row >= 0; row--)
@@ -382,9 +498,6 @@ $(function() {
 
     if (c.state == 'suspended') {
         createNotification('audiocontext is suspended, click anywhere to attempt to resume it...');
-    }
-    else {
-        killNotification();
     }
 
     $('.notification').on('click', () => {
@@ -403,19 +516,18 @@ $(function() {
     });
 
     $('#playbackbutton').on('click', function() {
-        paused = !paused;
-        if (paused) {
-            $('#playbackionbutton').attr('name', 'play-outline')
-        }
-        else {
-            $('#playbackionbutton').attr('name', 'pause-outline')
-        }
+        togglePause();
     })
+
+    // debug menu options
+    $('#nuke').on('click', function() {
+        nukeEverything();
+    });
 
     // if the data doesnt exist then it breaks, so we initialize it
     if (localStorage.getItem('tab1data') == null) {
-        for (let i = 1; i <= 4; i++) {
-            localStorage.setItem('tab' + i + 'data', "X");
+        for (let i = 1; i <= 8; i++) {
+            localStorage.setItem('tab' + i + 'data', "(4)X");
             // numLocalStorage++;
         }
     }
@@ -481,14 +593,28 @@ $(function() {
 
     // please dont go through the git history and see that instead of putting a for loop
     // i put like 7 different statements for each different tab hardcoded in
-    for (let i = 1; i <= 4; i++) {
-        $('#tab' + i).on('click', function() {changeTab(i);});
+    for (let i = 1; i <= 8; i++) {
+        $('#tab' + i).on('click', function() {
+            changeTab(i);
+        });
     }
     for (let i = 1; i <= 4; i++) {
-        $('#layer' + i).on('click', function() {changeLayer(i);});
+        $('#layer' + i).on('click', function() {
+            changeLayer(i);
+        });
+    }
+    for (let i = 1; i <= 7; i++) {
+        $('#pitch' + i).on('click', function() {
+            changePitch(i);
+        });
     }
 
-    let time = 150;
+    // handle all controls 
+    $(document).on('keydown', function(e) {
+        controlHandler(e);
+    });
+
+    let time = 150; // in ms
     // logic for the 'active' line that plays notes
     setInterval(function() {
         if (!paused) {

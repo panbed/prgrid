@@ -10,6 +10,10 @@ block content
       button(class='tabbutton' id='tab2') b
       button(class='tabbutton' id='tab3') c
       button(class='tabbutton' id='tab4') d
+      button(class='tabbutton' id='tab5') e
+      button(class='tabbutton' id='tab6') f
+      button(class='tabbutton' id='tab7') g
+      button(class='tabbutton' id='tab8') h
 
     div(id='layers')
       button(class='layerbutton' id='layer1') 1
@@ -78,7 +82,10 @@ block content
     p(id='message')
 
   div(id='menu' style='display: none')
-    h1 <i>prgrid</i>
+    div(id='logo')
+      //- h1 <i>prgrid</i>
+      a(href="https://github.com/panbed/prgrid" target="_blank") 
+        img(src='assets/prgrid_logo.webp' height=75)
     p import song
     input(
       type='text'
@@ -95,6 +102,34 @@ block content
       step='0.01'
       value='0.3'
     )
+    p speed
+    input(
+      type='range'
+      id='speed'
+      min='10'
+      max='1000'
+      step='1'
+      value='150'
+    )
+    p pitch
+    div(id='pitches')
+      button(id='pitch1' class='pitchbutton') 1
+      button(id='pitch2' class='pitchbutton') 2
+      button(id='pitch3' class='pitchbutton') 3
+      button(id='pitch4' class='pitchbutton') 4
+      button(id='pitch5' class='pitchbutton') 5
+      button(id='pitch6' class='pitchbutton') 6
+      button(id='pitch7' class='pitchbutton') 7
+      
+    p debug
+    div(id='debugbuttons')
+      button(title='Clear everything in the current song bank.' id='clear' class='debugbutton')
+        ion-icon(name="close-circle-sharp")
+      button(title='Nuke everything. Including localStorage.' id='nuke' class='debugbutton')
+        ion-icon(name="nuclear-sharp")
+      button(title='Shuffle the board!' id='shuffle' class='debugbutton')
+        ion-icon(name="shuffle-sharp")
+
     
 
 
