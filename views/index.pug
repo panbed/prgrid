@@ -2,7 +2,6 @@ extends layout
 
 block content
   div(id='main')
-
     // wait why am i doing all of this in pug anyways
     div(id='tabs')
       // todo: originally i wanted to make it so that you could add more tabs but eh
@@ -22,7 +21,7 @@ block content
       button(class='layerbutton' id='layer4') 4
 
 
-    //  is this bad? yeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    //  is this bad? yea probably
     - var count = 0;
     div(class='gridstyle' id='grid1')
       - var i = 0, j = 0
@@ -107,7 +106,7 @@ block content
       type='range'
       id='speed'
       min='10'
-      max='1000'
+      max='500'
       step='1'
       value='150'
     )

@@ -10,6 +10,7 @@ body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   /* font: 'VT323', monospace; */
+  accent-color: #5f5f5f;
 }
 
 a {

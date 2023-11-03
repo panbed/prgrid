@@ -53,7 +53,7 @@ function generateTable(startHz) {
 }
 
 generateTable(startHz)
-console.log(pitches)
+// console.log(pitches)
 
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
 var c = new AudioContext();
@@ -171,14 +171,15 @@ let currentLayer = 1;
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
 // let visibleNotes = [];      // i forgot what this does to be honest
 let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
-let vol = (localStorage.getItem('volume') == null) ? 0.3 :  localStorage.getItem('volume'); // set volume with localStorage
+let vol = (localStorage.getItem('volume') == null) ? 0.3 : localStorage.getItem('volume'); // set volume with localStorage
 let paused = false;         // playing by default, can pause playback by setting to false
 let columnOffset = 0;       // current playing column
 let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
 let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
 let layerIndex = 0;
 let activeLayers = [];
-// let numLocalStorage = Object.keys(localStorage).length;
+let time = 150; // in ms
+let timer;
 
 function localStorageExporter(currentTab) {
     let tabString = 'tab' + currentTab + 'data';
@@ -256,7 +257,7 @@ function exportNotes() {
     let exportedNotes = "";
     let currentNoteWaveform = "";
     // exportedNotes = exportedNotes.concat('[' + startingHz.indexOf(startHz) + ']');
-    console.log(startingHz.indexOf(startHz) + 1);
+    // console.log(startingHz.indexOf(startHz) + 1);
     exportedNotes = exportedNotes.concat('(' + (startingHz.indexOf(startHz) + 1) + ')'); // other settings (e.g speed, pitch)
     
     for (let i = 0; i < selectedNotes.length; i++) {
@@ -303,12 +304,6 @@ function loadNotes(noteString) {
         }
 
         if (valid) {
-
-
-            console.log("currently looking at:");
-            console.log(noteString[i]);
-
-
             while (noteString[i] != ',' && i < noteString.length) { // read the first data, the note num
                 currentNoteString = currentNoteString.concat(noteString[i++]); // add number to string then inc.
             }
@@ -369,7 +364,7 @@ function changeTab(tab) {
 
         // make tab color blank if its empty (blank format is something like " (4)X ")
         tabData = localStorage.getItem('tab' + i + 'data');
-        console.log(tabData);
+        // console.log(tabData);
         if (tabData.indexOf('X') == 3)
             $('#tab' + i).addClass('emptytab');
         else
@@ -437,8 +432,6 @@ function changePitch(pitch) {
             $('#pitch' + i).removeClass('pitchbuttonselected');
         }
     }
-
-
 }
 
 function togglePause() {
@@ -451,10 +444,20 @@ function togglePause() {
     }
 }
 
+function nukeEverything() {
+    // warning: this will, in fact, nuke everything
+    localStorage.clear();
+    location.reload();
+}
+
+function saveAndSendNotification() {
+    navigator.clipboard.writeText(exportNotes());
+    createNotification("copied current tab information to clipboard");
+}
 // TODO: maybe make the layer more obvious, since when something is playing it is kind of hard to see
-function controlHandler(e) {
+async function controlHandler(e) {
     var tag = e.target.tagName.toLowerCase();
-    if (tag != 'input' && tag != 'textarea') {
+    if (tag != 'input' && tag != 'textarea') { // make sure we dont detect kepresses in any inputs
         switch (e.key) {
             case ' ':
                 togglePause();
@@ -475,14 +478,25 @@ function controlHandler(e) {
             case 'd':
                 changeTab(++currentTab);
                 break;
+            case 'c':
+                saveAndSendNotification();
+                break;
+            case 'v':
+                // firefox for some reason doesnt let you read from clipboard
+                // so lets let the user know why copying doesnt work
+                if (typeof navigator.clipboard.readText === 'function')
+                    navigator.clipboard.readText().then((copiedString) => loadNotes(copiedString));
+                else createNotification("unable to read the clipboard :<");
+                break;
+            case 'Backspace':
+                clearNotes('cool'); // clear only the current layer
+                break;
         }
     }
 }
 
-function nukeEverything() {
-    // warning: this will, in fact, nuke everything
-    localStorage.clear();
-    location.reload();
+function gridInterval() {
+    if (!paused) notePlayer();
 }
 
 // the 'big' function that will be run when the page loads
@@ -521,7 +535,9 @@ $(function() {
 
     // debug menu options
     $('#nuke').on('click', function() {
-        nukeEverything();
+        if (confirm("hitting ok will nuke everything... are you sure you want to nuke everything...?!")) {
+            nukeEverything();
+        }
     });
 
     // if the data doesnt exist then it breaks, so we initialize it
@@ -546,14 +562,24 @@ $(function() {
         $('#loadtext').text(vol);
     });
 
+    $('#speed').on('change', function() {
+        time = this.value;
+        console.log(time);
+        clearInterval(timer); // clear old interval
+        timer = setInterval(gridInterval, time); // create new interval with new time
+    })
+
+    $('#clear').on('click', function() {
+        clearNotes();
+    });
+
     // logic for the load button and export button
     $('#loadbutton').on('click', function() {
         loadNotes($('#loadtext').val());
     });
 
     $('#savebutton').on('click', function() {
-        navigator.clipboard.writeText(exportNotes());
-        createNotification("copied current tab information to clipboard");
+        saveAndSendNotification();
     });
 
     // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
@@ -614,12 +640,7 @@ $(function() {
         controlHandler(e);
     });
 
-    let time = 150; // in ms
     // logic for the 'active' line that plays notes
-    setInterval(function() {
-        if (!paused) {
-            notePlayer();
-        }
-    }, time);
+    timer = setInterval(gridInterval, time);
 
 });
