@@ -99,8 +99,7 @@ function makeNoteActive() {
     noteSelector.data('waveform', noteWaveform);
     selectedNotes.push('' + noteNum);
     noteSelector.addClass('live');
-    // $('#note' + noteNum).text(noteWaveform.slice(0,3));
-    // $('#note' + noteNum).css('background-image', 'url(\'../assets/icons/black/square.png\')');
+
     switch (noteWaveform) {
         case 'square':
             noteSelector.addClass('squareTile');
@@ -146,10 +145,16 @@ function createNote(row, noteNum) {
 let notificationShown = 0;
 let showNotification = null;
 
-function createNotification(message) {
+function createNotification(message, color) {
     if (showNotification != null) {
         $('.notification').css('display', 'none');
         clearTimeout(showNotification);
+    }
+
+    // TODO: maybe fix this later idk it doesnt matter that much
+    if (color !== undefined) {
+        console.log('color detected...');
+        $('.notification').css('background-color', color);
     }
 
     $('#message').text(message);
@@ -454,43 +459,126 @@ function saveAndSendNotification() {
     navigator.clipboard.writeText(exportNotes());
     createNotification("copied current tab information to clipboard");
 }
+
+function changeNoteValue(note, min, max, direction) {
+    let newNote = Number(note); // WHY DOES IT THINK ITS A STRING
+    
+    switch (direction) {
+        case 'down':
+            // honestly this works but im going to be honest i don't really know what fixed it so im going to assume
+            // theres a bug in here that will occur randomly or sometihng
+            // UPDATE: this doesnt work
+            if (Number(note) + 16 >= max) {
+                if (Number(note) + 16 == max) newNote = min; 
+                else newNote = (Number(note) + 16) - max;
+            }
+            else {
+                newNote += 16;
+            }
+            break;
+        case 'up':
+            if (Number(note) - 16 < min) {
+                if (Number(note) - 16 == min) newNote = max - 1;
+                else newNote = (Number(note) - 16) + max;
+            }
+            else {
+                newNote -= 16;
+            }
+            break;
+        // this is a later thing....
+        // case 'left':
+        //     break;
+        // case 'right':
+        //     break;
+    }
+    console.log(newNote);
+    return newNote;
+}
+
+function shiftNotes(direction) {
+    for (let i = 0; i < selectedNotes.length; i++) {
+        if (currentLayer == 1 && selectedNotes[i] >= 0 && selectedNotes[i] < 256) { // layer 1
+            selectedNotes[i] = changeNoteValue(selectedNotes[i], 0, 256, direction);   
+        }
+        else if (currentLayer == 2 && selectedNotes[i] >= 256 && selectedNotes[i] < 512) { // layer 2
+            selectedNotes[i] = changeNoteValue(selectedNotes[i], 256, 512, direction);
+        }
+        else if (currentLayer == 3 && selectedNotes[i] >= 512 && selectedNotes[i] < 768) { // layer 3
+            selectedNotes[i] = changeNoteValue(selectedNotes[i], 512, 768, direction);
+        }
+        else if (currentLayer == 4 && selectedNotes[i] >= 768 && selectedNotes[i] < 1024) { // layer 4
+            selectedNotes[i] = changeNoteValue(selectedNotes[i], 767, 1024, direction);
+        }
+    }
+    
+    localStorageExporter(currentTab);
+    changeTab(currentTab); // lol (technically this refreshes the grid, sooooo might as well use it)
+}
+
 // TODO: maybe make the layer more obvious, since when something is playing it is kind of hard to see
 async function controlHandler(e) {
     var tag = e.target.tagName.toLowerCase();
-    if (tag != 'input' && tag != 'textarea') { // make sure we dont detect kepresses in any inputs
-        switch (e.key) {
-            case ' ':
-                togglePause();
-                break;
-            case 'ArrowDown':
-            case 's':
-                changeLayer(++currentLayer);
-                break;
-            case 'ArrowUp':
-            case 'w':
-                changeLayer(--currentLayer);
-                break;
-            case 'ArrowLeft':
-            case 'a':
-                changeTab(--currentTab);
-                break;
-            case 'ArrowRight':
-            case 'd':
-                changeTab(++currentTab);
-                break;
-            case 'c':
-                saveAndSendNotification();
-                break;
-            case 'v':
-                // firefox for some reason doesnt let you read from clipboard
-                // so lets let the user know why copying doesnt work
-                if (typeof navigator.clipboard.readText === 'function')
-                    navigator.clipboard.readText().then((copiedString) => loadNotes(copiedString));
-                else createNotification("unable to read the clipboard :<");
-                break;
-            case 'Backspace':
-                clearNotes('cool'); // clear only the current layer
-                break;
+    if (tag != 'input' && tag != 'textarea') { // make sure we dont detect keypresses in any inputs
+        // handle special 'shift' inputs
+        if (e.shiftKey) {
+            switch (e.key) {
+                // this has so many bugs im honestly just going to put this on the backburner
+                // TODO: need to attach note type information to note so when it shifts it doesnt turn into a square
+                // wave or something, also it doesnt work on the 2nd, 3rd and 4th layer, etc. 
+                // case 'ArrowDown': // shift all current notes down
+                //     console.log('shift + arrowdown');
+                //     shiftNotes('down');
+                //     break;
+                // case 'ArrowUp': // shift all current notes up
+                //     console.log('shift + arrowup');
+                //     shiftNotes('up');
+                //     break;
+                // case 'ArrowLeft': // shift all current notes down
+                //     console.log('shift + arrowleft');
+                //     shiftNotes('left');
+                //     break;
+                // case 'ArrowRight': // shift all current notes up
+                //     console.log('shift + arrowright');
+                //     shiftNotes('right');
+                //     break;
+            }
+        }
+        else {
+            switch (e.key) {
+                case ' ':
+                    togglePause();
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    changeLayer(++currentLayer);
+                    break;
+                case 'ArrowUp':
+                case 'w':
+                    changeLayer(--currentLayer);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                    changeTab(--currentTab);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    changeTab(++currentTab);
+                    break;
+                case 'c':
+                    saveAndSendNotification();
+                    break;
+                case 'v':
+                    // firefox for some reason doesnt let you read from clipboard
+                    // so lets let the user know why copying doesnt work
+                    if (typeof navigator.clipboard.readText === 'function')
+                        navigator.clipboard.readText().then((copiedString) => loadNotes(copiedString));
+                    else createNotification("unable to read the clipboard :<");
+                    break;
+                case 'Backspace':
+                    clearNotes('cool'); // clear only the current layer
+                    localStorageExporter(currentTab);
+                    break;
+            }
         }
     }
 }
@@ -571,6 +659,7 @@ $(function() {
 
     $('#clear').on('click', function() {
         clearNotes();
+        localStorageExporter(currentTab);
     });
 
     // logic for the load button and export button
@@ -600,9 +689,11 @@ $(function() {
         switch (currentwaveForm) {
             case 0: // square
                 $(this).css('background-image', 'url(\'../assets/icons/white/square.png\')');
+                createNotification('square')
                 break;
             case 1: // saw
                 $(this).css('background-image', 'url(\'../assets/icons/white/sawtooth.png\')');
+                createNotification('square')
                 break;
             case 2: // sine
                 $(this).css('background-image', 'url(\'../assets/icons/white/sine.png\')');
