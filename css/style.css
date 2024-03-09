@@ -196,16 +196,16 @@ a {
 }
 
 .squareTile {
-  background-image: url('../assets/icons/black/square.png');
+  background-image: url('/img/icons/black/square.png');
 }
 .sineTile {
-  background-image: url('../assets/icons/black/sine.png');
+  background-image: url('/img/icons/black/sine.png');
 }
 .triangleTile {
-  background-image: url('../assets/icons/black/triangle.png');
+  background-image: url('/img/icons/black/triangle.png');
 }
 .sawtoothTile {
-  background-image: url('../assets/icons/black/sawtooth.png');
+  background-image: url('/img/icons/black/sawtooth.png');
 }
 
 .playing {
@@ -239,7 +239,7 @@ a {
 
 #controls #waveforms {
   font-family: 'DotGothic16', monospace !important;
-  background-image: url('../assets/icons/white/square.png');
+  background-image: url('/img/icons/white/square.png');
   background-repeat: no-repeat;
   background-position: center;
   color: #ffffff00;
