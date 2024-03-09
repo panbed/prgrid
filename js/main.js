@@ -674,15 +674,18 @@ $(function() {
         localStorageExporter(currentTab);
     });
 
+    $('#waveformtooltip').html("Switch waveforms.\n" + "<b>" + waveforms[currentwaveForm] + "</b>");
     // logic for the waveform button, displays the current waveform text
     $('#waveforms').on('click', function() {
         // increment what waveform we're on
         currentwaveForm++;
-        
+
         // reset back to zero when out of bounds
         if (currentwaveForm > 3) 
             currentwaveForm = 0;
 
+        $('#waveformtooltip').html("Switch waveforms.\n" + "<b>" + waveforms[currentwaveForm] + "</b>");
+            
         switch (currentwaveForm) {
             case 0: // square
                 $(this).css('background-image', 'url(\'img/icons/white/square.png\')');

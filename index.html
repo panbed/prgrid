@@ -1064,16 +1064,20 @@
         <button id="note1023"></button>
       </div>
       <div id="controls">
-        <button id="playbackbutton">
+        <button id="playbackbutton" class="tooltip">
+          <span class="tooltiptext">Toggle pause and play.</span>
           <ion-icon name="pause-outline" id="playbackionbutton"></ion-icon>
         </button>
-        <button id="clearbutton">
+        <button id="clearbutton" class="tooltip">
+          <span class="tooltiptext">Delete the current layer.</span>
           <ion-icon name="trash-outline"></ion-icon>
         </button>
-        <button id="savebutton">
+        <button id="savebutton" class="tooltip">
+          <span class="tooltiptext">Copy tab to clipboard.</span>
           <ion-icon name="save-outline"></ion-icon>
         </button>
-        <button id="waveforms">
+        <button id="waveforms" class="tooltip">
+          <span class="tooltiptext" id="waveformtooltip">placeholder waveform!</span>
           <ion-icon name="trash-outline"></ion-icon>
         </button>
       </div>
