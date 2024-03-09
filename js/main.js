@@ -685,18 +685,18 @@ $(function() {
 
         switch (currentwaveForm) {
             case 0: // square
-                $(this).css('background-image', 'url(\'../assets/icons/white/square.png\')');
+                $(this).css('background-image', 'url(\'img/icons/white/square.png\')');
                 createNotification('square')
                 break;
             case 1: // saw
-                $(this).css('background-image', 'url(\'../assets/icons/white/sawtooth.png\')');
+                $(this).css('background-image', 'url(\'img/icons/white/sawtooth.png\')');
                 createNotification('square')
                 break;
             case 2: // sine
-                $(this).css('background-image', 'url(\'../assets/icons/white/sine.png\')');
+                $(this).css('background-image', 'url(\'img/icons/white/sine.png\')');
                 break;
             case 3: // triangle
-                $(this).css('background-image', 'url(\'../assets/icons/white/triangle.png\')');
+                $(this).css('background-image', 'url(\'img/icons/white/triangle.png\')');
                 break;
         }
 
