@@ -6,38 +6,37 @@ TODO: the long list
  */
 
 const startingHz = [
-    55.00, // a1
-    110.00, // a2
-    220.00, // a3
-    440.00, // a4
-    880.00, // a5
-    1760.00, // a6
-    3520.00, // a7
+    55.00,      // a1
+    110.00,     // a2
+    220.00,     // a3
+    440.00,     // a4
+    880.00,     // a5
+    1760.00,    // a6
+    3520.00,    // a7
+]
+
+// pitch numbers relative to A4
+const minorPentatonicScale = [
+    -24,        // a2
+    -21,        // c2
+    -19,        // d2
+    -17,        // e2
+    -14,        // g2
+    -12,        // a3
+    -9,         // c3
+    -7,         // d3
+    -5,         // e3
+    -2,         // g3
+    0,          // a4
+    3,          // c4
+    5,          // d4
+    7,          // e4
+    10,         // g4
+    12          // a5
 ]
 
 // set starting note to A4 (440hz)
 let startHz = startingHz[3];
-
-// pitch numbers relative to A4
-// a2, c2, d2, e2, g2, a3, c3, d3, e3, g3, a4, c4, d4, e4, g4, a5
-const minorPentatonicScale = [
-    -24,
-    -21,
-    -19,
-    -17,
-    -14,
-    -12,
-    -9,
-    -7,
-    -5,
-    -2,
-    0,
-    3,
-    5,
-    7,
-    10,
-    12
-]
 
 const pitches = [];
 // generate pitch table, starting from C0 to C8:
@@ -53,9 +52,8 @@ function generateTable(startHz) {
 }
 
 generateTable(startHz)
-// console.log(pitches)
 
-const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];   // allowed waveforms
+const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];
 var c = new AudioContext();
 var o, g = null;
 function playNote(freq, vol, waveform, startTime, stopTime) {
@@ -64,7 +62,6 @@ function playNote(freq, vol, waveform, startTime, stopTime) {
     if (c.state == 'suspended') {
         // try fixing an issue that will create a loud noise when audiocontext is blocked
         // probably inefficient? but it saves my ears :-)
-        // console.log('audiocontext suspended');
         c.resume();
         // g.gain.value = 0;
     }
@@ -76,6 +73,7 @@ function playNote(freq, vol, waveform, startTime, stopTime) {
         g.connect(c.destination);
         o.frequency.value = freq;
         g.gain.value = vol;
+        // the gain stuff and linearramp whatever causes performance issues im probably doing something wrong
         //g.gain.setValueAtTime(1, c.currentTime);
         o.start(startTime);
         //g.gain.setTargetAtTime(0, c.currentTime, 0.015);
@@ -125,12 +123,10 @@ function createNote(row, noteNum) {
     noteSelector.on('click', function() {
         // if the note is active, then remove the live class from it and 'reset' it
         if ($(this).hasClass('live')) {
-            // selectedNotes.splice(selectedNotes.indexOf(noteNum), 1);
             for (let i = selectedNotes.length; i--;) {
                 if (selectedNotes[i] == noteNum) selectedNotes.splice(i, 1);
             }
             $(this).removeClass('live');
-            // $(this).text("");
             $(this).removeClass('squareTile sineTile sawtoothTile triangleTile');
         }
         // else just make it active and then play a note sample
