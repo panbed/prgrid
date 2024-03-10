@@ -9,7 +9,6 @@ body {
 
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
-  /* font: 'VT323', monospace; */
   accent-color: #5f5f5f;
 }
 
@@ -19,7 +18,7 @@ a {
 
 #menuButton {
   position: absolute;
-  background-color: #00000000;
+  background-color: #000000aa;
   color: var(--foreground);
   border-style: none;
   padding: 0.75em 0.75em 0.75em 0.75em;
@@ -221,6 +220,7 @@ a {
 #controls {
   margin-top: 1.5em;
   text-align: center;
+  margin-left: -1.0em;
 }
 
 #controls button {
@@ -252,9 +252,9 @@ a {
 }
 
 #tabs {
-  padding: 2em; /* 2em */
+  padding: 2em;
   text-align: center;
-  margin-left: -0.850em; /* cool hardcoded manual centering (tm) */
+  margin-left: -1.450em; /* cool hardcoded manual centering (tm) */
 }
 
 .tabbutton {

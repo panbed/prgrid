@@ -171,7 +171,6 @@ function killNotification() {
 let currentTab = 1;         // set the current tab and default (1)
 let currentLayer = 1;
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
-// let visibleNotes = [];      // i forgot what this does to be honest
 let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
 let vol = (localStorage.getItem('volume') == null) ? 0.3 : localStorage.getItem('volume'); // set volume with localStorage
 let paused = false;         // playing by default, can pause playback by setting to false
@@ -249,6 +248,8 @@ function notePlayer() {
         }
     }
 
+    document.title = "prgrid - " + activeLayers.length + " active";
+
     columnOffset++;     // increment the current column
     activeNotes = [];   // reset the active notes, since we moved to the next column
     layerIndex = 0;
@@ -258,8 +259,7 @@ function notePlayer() {
 function exportNotes() {
     let exportedNotes = "";
     let currentNoteWaveform = "";
-    // exportedNotes = exportedNotes.concat('[' + startingHz.indexOf(startHz) + ']');
-    // console.log(startingHz.indexOf(startHz) + 1);
+
     exportedNotes = exportedNotes.concat('(' + (startingHz.indexOf(startHz) + 1) + ')'); // other settings (e.g speed, pitch)
     
     for (let i = 0; i < selectedNotes.length; i++) {
@@ -638,13 +638,16 @@ $(function() {
     changeLayer(1);
 
     // logic for volume slider
+    $("#volumetext").text("volume: " + Math.round((vol*100)));
     $('#volume').attr('value', vol);
     $('#volume').on('input', function() {
         vol = this.value;
         localStorage.setItem('volume', this.value);
+        $("#volumetext").text("volume: " + Math.round((vol*100)));
     });
     $('#volume').on('change', function() {
-        $('#loadtext').text(vol);
+        $('#loadtext').text(vol); // wat
+        $("#volumetext").text("volume: " + Math.round((vol*100)));
     });
 
     $('#speed').on('change', function() {
