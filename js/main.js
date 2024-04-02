@@ -55,11 +55,13 @@ function generateTable(startHz) {
 generateTable(startHz)
 
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];
-var c = new AudioContext();
-var o, g = null;
+let c = new AudioContext();
+let o, g = null;
 function playNote(freq, vol, waveform, startTime, stopTime) {
-    o = c.createOscillator();
-    g = c.createGain();
+    // o = c.createOscillatorNode(c);
+    o = new OscillatorNode(c);
+    // g = c.createGain();
+    g = new GainNode(c);
     if (c.state == 'suspended') {
         // try fixing an issue that will create a loud noise when audiocontext is blocked
         // probably inefficient? but it saves my ears :-)
@@ -70,17 +72,17 @@ function playNote(freq, vol, waveform, startTime, stopTime) {
         o.type = waveform;
         //o.connect(c.destination);
         //g.connect(c.destination);
-        o.connect(g);
-        g.connect(c.destination);
+        o.connect(g).connect(c.destination);
+        // g.connect(c.destination);
         o.frequency.value = freq;
         g.gain.value = vol;
         // the gain stuff and linearramp whatever causes performance issues im probably doing something wrong
-        //g.gain.setValueAtTime(1, c.currentTime);
+        g.gain.setValueAtTime(1, c.currentTime);
         o.start(startTime);
         //g.gain.setTargetAtTime(0, c.currentTime, 0.015);
         o.stop(stopTime);
-        //g.gain.setValueAtTime(1, stopTime - 0.25);
-        //g.gain.linearRampToValueAtTime(0, stopTime);
+        g.gain.setValueAtTime(1, stopTime - 0.25);
+        g.gain.linearRampToValueAtTime(0, stopTime);
     }
 }
 
@@ -223,6 +225,9 @@ function notePlayer() {
 
             // play the note if it has the live class
             if ($('#note' + (columnOffset + (layerIndex * 256) + (i * 16))).hasClass('live')) {
+                // TODO: some kind of way to allow for variable length notes, maybe add a "length" class (either 1/4, 1/2, 3/4, 1 or something)
+                // at this point itd probably be better to just make the notes an object or something but eh
+                // probably need to edit the saving/loading text function, the .data for notes
                 playNote(pitches[15 - i], vol, $('#note' + (columnOffset  + (layerIndex * 256) + (i * 16))).data('waveform'), c.currentTime, c.currentTime + 0.150);
                 activeLayers.push(layerIndex + 1);
             }
