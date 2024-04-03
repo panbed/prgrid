@@ -1,11 +1,24 @@
+/* TODO: the long list
+UI:
+    - make it more user friendly (i sent the current ui to my friends and they had no idea wat they were looking at)
+    - dragging across the grid to place multiple notes/remove multiple
+    - perhaps add a better contrast mode (on some monitors it may be too dark to see anything)
+        maybe light/darkmode for contrast
+    - maybe some cool visualizer effect or something
 
-/*
-TODO: the long list
-- make actually decent menu ui, its really bad right now
-- add some way to change scale (maybe just happy/sad, and a pitch that just adds a num to every pitch hz)
-- make sounds less crunchy? i think it has to do with the commented out code in playnote about linearramp or something
- */
 
+SOUNDS:
+    - theres some noticeable lag for some reason
+    - add some way to change scale (maybe just happy/sad)
+    - test out fadeout for oscillator, it may be buggy 
+        (this is implemented but i want to make sure its not causing lag)
+    - add custom note fadeout time 
+        perhaps by scrolling on the note, data stored in notedata?
+    - maybe custom oscillator/samples?
+    
+*/
+
+// 
 const startingHz = [
     55.00,      // a1
     110.00,     // a2
@@ -54,35 +67,40 @@ function generateTable(startHz) {
 
 generateTable(startHz)
 
+// variables used to set options for playback
+let currentTab = 1;         // tabs (or song bank, represented by a-h on the top)
+let currentLayer = 1;       // layers (4 layers per bank, represented by 1-4 on the left)
+let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
+let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
+let vol = (localStorage.getItem('volume') == null) ? 0.3 : localStorage.getItem('volume'); // set volume with localStorage
+let paused = false;         // playing by default, can pause playback by setting to true
+let columnOffset = 0;       // column that is currently highlighted
+let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
+let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
+let layerIndex = 0;         
+let activeLayers = [];
+let time = 150; // in ms
+let timer;
+
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];
+
 let c = new AudioContext();
 let o, g = null;
 function playNote(freq, vol, waveform, startTime, stopTime) {
-    // o = c.createOscillatorNode(c);
-    o = new OscillatorNode(c);
-    // g = c.createGain();
-    g = new GainNode(c);
+    o = new OscillatorNode(c); // create the oscillator
+    g = new GainNode(c); // create the gainnode, which we'll use for the volume of the note
     if (c.state == 'suspended') {
-        // try fixing an issue that will create a loud noise when audiocontext is blocked
-        // probably inefficient? but it saves my ears :-)
-        c.resume();
-        // g.gain.value = 0;
+        c.resume(); 
     }
     else {
-        o.type = waveform;
-        //o.connect(c.destination);
-        //g.connect(c.destination);
-        o.connect(g).connect(c.destination);
-        // g.connect(c.destination);
-        o.frequency.value = freq;
-        g.gain.value = vol;
-        // the gain stuff and linearramp whatever causes performance issues im probably doing something wrong
-        g.gain.setValueAtTime(1, c.currentTime);
-        o.start(startTime);
-        //g.gain.setTargetAtTime(0, c.currentTime, 0.015);
-        o.stop(stopTime);
-        g.gain.setValueAtTime(1, stopTime - 0.25);
-        g.gain.linearRampToValueAtTime(0, stopTime);
+        o.type = waveform; // set the waveform type
+        o.connect(g).connect(c.destination); // osc -> gain -> audiocontext
+        o.frequency.value = freq; // set the frequency of the wave (the pitch) to the passed in freq value
+        g.gain.setValueAtTime(vol, c.currentTime); // set volume on notestart
+        g.gain.setValueAtTime(vol, stopTime - 0.25); // 
+        o.start(startTime); // start playing the note at specified time
+        o.stop(stopTime); // stop playing the note at the specified time
+        g.gain.linearRampToValueAtTime(0, stopTime); // fade out the note
     }
 }
 
@@ -101,6 +119,7 @@ function makeNoteActive() {
     selectedNotes.push('' + noteNum);
     noteSelector.addClass('live');
 
+    // display corresponding waveform on note when placed
     switch (noteWaveform) {
         case 'square':
             noteSelector.addClass('squareTile');
@@ -122,7 +141,7 @@ function createNote(row, noteNum) {
     let noteSelector = $('#note' + noteNum);
     noteSelector.data('noteNum', noteNum);
     noteSelector.data('waveform', waveforms[currentwaveForm]);
-
+    
     noteSelector.on('click', function() {
         // if the note is active, then remove the live class from it and 'reset' it
         if ($(this).hasClass('live')) {
@@ -169,20 +188,6 @@ function killNotification() {
     $('.notification').fadeOut('fast');
     clearTimeout(showNotification);
 }
-
-let currentTab = 1;         // set the current tab and default (1)
-let currentLayer = 1;
-let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
-let currentwaveForm = 0;    // default to square wave (look at const waveforms for reference)
-let vol = (localStorage.getItem('volume') == null) ? 0.3 : localStorage.getItem('volume'); // set volume with localStorage
-let paused = false;         // playing by default, can pause playback by setting to false
-let columnOffset = 0;       // current playing column
-let visibleOffset = 0;      // set offset for visible grid buttons (256 * (0, 1, 2, 3))
-let activeNotes = [];       // notes that are highlighted by the omnipresent moving bar
-let layerIndex = 0;
-let activeLayers = [];
-let time = 150; // in ms
-let timer;
 
 function localStorageExporter(currentTab) {
     let tabString = 'tab' + currentTab + 'data';

@@ -1,6 +1,9 @@
 :root {
   --background: #000000;
   --foreground: #ffffff;
+
+  --background-light: #ffffff;
+  --foreground-light: #000000;
 }
 
 body {
@@ -49,7 +52,7 @@ a {
 }
 
 #loadtext {
-  width: 85%;
+  width: 80%;
   font-family: 'DotGothic16', monospace !important;
   background-color: #000000;
   border-color: #2f2f2f;
@@ -176,7 +179,7 @@ a {
   border-color: #2f2f2f;
   border-style: solid;
   /* this adds a bit of cpu time idk if its worth it but it makes it feel slightly nicer */
-  transition: all 0.2s;
+  /* transition: all 0.2s; */
 }
 
 .gridstyle button:hover {
