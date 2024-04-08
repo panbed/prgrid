@@ -13,11 +13,12 @@
   </head>
   <body>
     <div id="main">
+      <canvas id="visualizer" width="250" height="250"></canvas>
       <div class="help">
         <p id="tabhelp"><b>eight</b> song banks</p>
         <p id="layerhelp"><b>four</b> layers per bank</p>
         <p id="gridhelp">
-          hai :3<br><br>
+          <!-- hai :3<br><br> -->
           presented upon you is a <b>16x16 grid</b>:<br><br>
           <b>click</b> on a square to place a note,<br><br>
           <b>hover</b> over the bottom toolbar for info <br><br>
@@ -1128,9 +1129,15 @@
         <!-- <button class="debugbutton" title="Shuffle the board!" id="shuffle">
           <ion-icon name="shuffle-sharp"></ion-icon>
         </button> -->
-        <button class="debugbutton" title="Help!" id="helpbutton">
-          <ion-icon name="help-circle-outline"></ion-icon>
+        <button class="debugbutton" title="Toggle visualizer." id="visbutton">
+          <ion-icon name="eye"></ion-icon>
         </button>
+        <button class="debugbutton" title="Help!" id="helpbutton">
+          <ion-icon name="help-circle"></ion-icon>
+        </button>
+      </div>
+      <div id="about">
+        <p>made by bed :3</p>
       </div>
     </div>
     <script type="text/javascript" src="js/main.js"></script>

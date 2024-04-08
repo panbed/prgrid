@@ -424,3 +424,25 @@ a {
   left: 119.23847625%;
   transform: translate(-50%, -50%);
 }
+
+#about {
+  text-align: center;
+  font-size: small;
+  opacity: 15%;
+  transition: opacity 0.3s;
+}
+
+#about:hover {
+  opacity: 100%;
+}
+
+#visualizer {
+  /* width: 31em; */
+  position: absolute;
+  top: 51.625%;
+  left: 44.55%;
+  /* margin-right: -20%; */
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 50%
+}

@@ -83,10 +83,19 @@ let layerIndex = 0;
 let activeLayers = [];
 let time = 150; // in ms
 let timer;
+let showVisualizer = true;  // show visualizer by default
+
+const canvas = document.getElementById('visualizer');
+const ctx = canvas.getContext("2d");
 
 const waveforms = ['square', 'sawtooth', 'sine', 'triangle'];
 
 let c = new AudioContext();
+let a = c.createAnalyser(); // create analyzer for visualization later
+a.fftSize = 2048;
+a.smoothingTimeConstant = 0.85;
+const bufferLength = a.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
 let o, g = null;
 function playNote(freq, vol, waveform, startTime, stopTime) {
     o = new OscillatorNode(c); // create the oscillator
@@ -96,13 +105,14 @@ function playNote(freq, vol, waveform, startTime, stopTime) {
     }
     else {
         o.type = waveform; // set the waveform type
-        o.connect(g).connect(c.destination); // osc -> gain -> audiocontext
+        o.connect(g).connect(a).connect(c.destination); // osc -> gain -> audiocontext
         o.frequency.value = freq; // set the frequency of the wave (the pitch) to the passed in freq value
         g.gain.setValueAtTime(vol, c.currentTime); // set volume on notestart
         g.gain.setValueAtTime(vol, stopTime - 0.25); // 
         o.start(startTime); // start playing the note at specified time
         o.stop(stopTime); // stop playing the note at the specified time
         g.gain.linearRampToValueAtTime(0, stopTime); // fade out the note
+
     }
 }
 
@@ -632,6 +642,46 @@ function showHelp(timeout = 10000) {
     }, timeout)
 }
 
+// cool visualizer thank you mozilla
+// https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
+let width = window.innerWidth - 100;
+let height = window.innerHeight - 100;
+canvas.width = width;
+canvas.height = height;
+console.log(width);
+ctx.clearRect(0, 0, width, height);
+function draw() {
+    if (showVisualizer) {
+        const vis = requestAnimationFrame(draw)
+        a.getByteTimeDomainData(dataArray);
+        ctx.fillStyle = "rgba(0, 0, 0)";
+        ctx.fillRect(0, 0, width, height);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = "rgb(200 200 200)";
+        ctx.beginPath();
+        const sliceWidth = width / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = v * (height / 2);
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            }
+            else {
+                ctx.lineTo(x, y);
+            }
+            x += sliceWidth;
+        }
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+    }
+    else {
+        ctx.clearRect(0, 0, width, height);
+    }
+}
+
+
+
 // the 'big' function that will be run when the page loads
 $(function() {
     // create all the notes on the board
@@ -675,6 +725,12 @@ $(function() {
     // show help text(s) when clicking the help button
     $('#helpbutton').on('click', function() {
         showHelp();
+    })
+    $('#visbutton').on('click', function() {
+        showVisualizer = !showVisualizer;
+        if (showVisualizer) {
+            draw();
+        }
     })
 
     // if the data doesnt exist then it breaks, so we initialize it
@@ -722,6 +778,7 @@ $(function() {
     $('#savebutton').on('click', function() {
         saveAndSendNotification();
     });
+
 
     // todo: fix stuff where if you import something it doesnt automatically update the layer if it went
     // from being empty to full (maybe just be lazy and add changelayer(currentlayer) or something idk)
@@ -790,6 +847,17 @@ $(function() {
 
     // fade out help text after 10 seconds
     showHelp(10000);
-    
+
+    // resize visualizer when resizing window
+    $(window).on('resize', function() {
+        width = window.innerWidth - 100;
+        height = window.innerHeight - 100;
+        canvas.width = width;
+        canvas.height = height;
+    });
+    // visualizer
+    draw();
+
+
 });
 
