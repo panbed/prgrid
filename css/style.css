@@ -179,7 +179,7 @@ a {
   border-color: #2f2f2f;
   border-style: solid;
   /* this adds a bit of cpu time idk if its worth it but it makes it feel slightly nicer */
-  /* transition: all 0.2s; */
+  transition: all 0.2s;
 }
 
 .gridstyle button:hover {
@@ -247,6 +247,7 @@ a {
   background-position: center;
   color: #ffffff00;
   text-align: right;
+
 }
 
 #controls button:hover {
@@ -367,7 +368,7 @@ a {
   margin-left: -65px;
   transition: all 0.3s;
   position: absolute;
-  z-index: 999;
+  z-index: 100;
 }
 
 .tooltiptext {
@@ -378,4 +379,48 @@ a {
   transition-delay: 1s;
   visibility: visible;
   opacity: 1;
+}
+
+.help {
+  font-family: 'DotGothic16', monospace !important;
+  z-index: 50;
+}
+
+/* styles for different help text */
+#tabhelp {
+  display: none;
+  position: absolute;
+  top: -1.5%;
+  left: 46%;
+  transform: translate(-50%, -50%);
+}
+
+#layerhelp {
+  display: none;
+  position: absolute;
+  top: 46.1235%;
+  left: -47.75%;
+  transform: rotate(-90deg);
+}
+
+#menuhelp {
+  /* display: none; */
+  position: absolute;
+  padding-left: 4em;
+  transform: translateY(-0.5em);
+
+  /* opacity: 15%;
+  transition: opacity 0.3s; */
+}
+
+/* #menuhelp:hover {
+  opacity: 100%;
+} */
+
+#gridhelp {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 119.23847625%;
+  transform: translate(-50%, -50%);
 }

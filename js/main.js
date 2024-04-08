@@ -8,14 +8,15 @@ UI:
 
 
 SOUNDS:
-    - theres some noticeable lag for some reason
+    - theres some noticeable lag for some reason 
+        APPARENTLY THIS IS BECAUSE OF SETINTERVAL AND HOW ITS NOT GUARANTEED TO ACTUALLY TAKE 150MS ??
     - add some way to change scale (maybe just happy/sad)
     - test out fadeout for oscillator, it may be buggy 
         (this is implemented but i want to make sure its not causing lag)
     - add custom note fadeout time 
         perhaps by scrolling on the note, data stored in notedata?
     - maybe custom oscillator/samples?
-    
+    - take a peep at delaynode
 */
 
 // 
@@ -68,6 +69,7 @@ function generateTable(startHz) {
 generateTable(startHz)
 
 // variables used to set options for playback
+let showingHelp = true;     // if help text is showing, this is set to true
 let currentTab = 1;         // tabs (or song bank, represented by a-h on the top)
 let currentLayer = 1;       // layers (4 layers per bank, represented by 1-4 on the left)
 let selectedNotes = [];     // notes that are 'lit up' on the board, none by default
@@ -258,7 +260,9 @@ function notePlayer() {
         }
     }
 
-    document.title = "prgrid - " + activeLayers.length + " active";
+    // display how many notes are currently being played and also how many are currently 'lit'
+    // document.title = "prgrid - " + activeLayers.length + " active";
+    if (!showingHelp) $("#menuhelp").text(activeLayers.length + ' active / ' + selectedNotes.length + " total");
 
     columnOffset++;     // increment the current column
     activeNotes = [];   // reset the active notes, since we moved to the next column
@@ -590,8 +594,42 @@ async function controlHandler(e) {
     }
 }
 
+// this solution works to help mitigate the lag a little bit but it breaks the speed functionality
+// https://stackoverflow.com/questions/29971898/how-to-create-an-accurate-timer-in-javascript
+// let expected = Date.now() + time;
+// setTimeout(gridInterval, time);
 function gridInterval() {
-    if (!paused) notePlayer();
+    // let dt = Date.now() - expected;
+    // setTimeout(gridInterval, Math.max(0, time - dt));
+    // if (dt > time) {
+    //     expected += dt;
+    //     console.log("lag!!");
+    // }
+
+    if (!paused) {
+        c.resume();
+        notePlayer();
+    }
+    else {
+        c.suspend();
+    }
+    // console.log(c.currentTime);
+
+    // expected += time;
+}
+
+// show help by fading in text, then hiding it after 10s (default)
+let showHelpTimeout;
+function showHelp(timeout = 10000) {
+    clearTimeout(showHelpTimeout);
+    $('#tabhelp,#layerhelp,#gridhelp').fadeOut('fast');
+    $('#tabhelp,#layerhelp,#gridhelp').fadeIn('fast');
+    $("#menuhelp").text("<- click here for the menu")
+    showingHelp = true;
+    showHelpTimeout = setTimeout(function() {
+        $('#tabhelp,#layerhelp,#gridhelp').fadeOut('fast');
+        showingHelp = false;
+    }, timeout)
 }
 
 // the 'big' function that will be run when the page loads
@@ -634,6 +672,10 @@ $(function() {
             nukeEverything();
         }
     });
+    // show help text(s) when clicking the help button
+    $('#helpbutton').on('click', function() {
+        showHelp();
+    })
 
     // if the data doesnt exist then it breaks, so we initialize it
     if (localStorage.getItem('tab1data') == null) {
@@ -743,6 +785,11 @@ $(function() {
     });
 
     // logic for the 'active' line that plays notes
+    // setInterval is apparently very inaccurate
     timer = setInterval(gridInterval, time);
 
+    // fade out help text after 10 seconds
+    showHelp(10000);
+    
 });
+

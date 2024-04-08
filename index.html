@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>prgrid</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -12,6 +13,16 @@
   </head>
   <body>
     <div id="main">
+      <div class="help">
+        <p id="tabhelp"><b>eight</b> song banks</p>
+        <p id="layerhelp"><b>four</b> layers per bank</p>
+        <p id="gridhelp">
+          hai :3<br><br>
+          presented upon you is a <b>16x16 grid</b>:<br><br>
+          <b>click</b> on a square to place a note,<br><br>
+          <b>hover</b> over the bottom toolbar for info <br><br>
+        </p>
+      </div>
       <!-- trust me, i didnt write like a thousand buttons, it was generated from pug lol :) -->
       <div id="tabs">
         <!-- todo: originally i wanted to make it so that you could add more tabs but eh-->
@@ -1082,10 +1093,11 @@
         </button>
       </div>
     </div>
-    <div id="menuButton"><i class="fa fa-bars"></i></div>
+    <div id="menuButton"><i class="fa fa-bars"></i></div><p id="menuhelp" class="help"></p>
     <div class="notification" style="display: none">
       <p id="message"></p>
     </div>
+    
     <div id="menu" style="display: none">
       <div id="logo"><a href="https://github.com/panbed/prgrid" target="_blank"> <img src="img/prgrid_logo.webp" height="75"></a></div>
       <p>import song</p>
@@ -1113,8 +1125,11 @@
         <button class="debugbutton" title="Nuke everything. Including localStorage." id="nuke">
           <ion-icon name="nuclear-sharp"></ion-icon>
         </button>
-        <button class="debugbutton" title="Shuffle the board!" id="shuffle">
+        <!-- <button class="debugbutton" title="Shuffle the board!" id="shuffle">
           <ion-icon name="shuffle-sharp"></ion-icon>
+        </button> -->
+        <button class="debugbutton" title="Help!" id="helpbutton">
+          <ion-icon name="help-circle-outline"></ion-icon>
         </button>
       </div>
     </div>
