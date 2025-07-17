@@ -1,0 +1,10 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(16, 2vw);
+  grid-auto-rows: 2vw;
+  gap: 0.25rem;
+}
+
+button {
+  color: red;
+}

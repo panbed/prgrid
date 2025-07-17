@@ -1,0 +1,28 @@
+button {
+  background-color: black;
+  border-style: solid;
+  border-color: #2f2f2f;
+  border-radius: 0.25rem;
+  border-width: 0.25rem;
+
+  &:hover {
+    background-color: #2f2f2f;
+  }
+}
+
+.active {
+  border-color: #4f4f4f;
+}
+
+.lit {
+  background-color: white;
+  border-color: white;
+
+  &:hover {
+    background-color: #dfdfdf;
+  }
+}
+
+.active.lit {
+  transform: scale(1.25);
+}
