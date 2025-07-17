@@ -10,3 +10,21 @@ body, html {
   justify-content: center;
   align-items: center;
 }
+
+#loading-container {
+  font-size: x-large;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
+  img {
+    padding: 1em;
+  }
+
+  p {
+    margin: 0;
+  }
+}

@@ -1,0 +1,49 @@
+#toolbar {
+    display: flex;
+    gap: 0.5em;
+}
+
+#toolbar button {
+    cursor: pointer;
+    justify-content: center;
+    display: flex;
+    width: 5rem;
+    padding: 1em;
+    /* padding: 0.75em 2.75em 0.75em 2.75em; */
+    text-align: center;
+    border: 0;
+    color: white;
+
+    opacity: 15%;
+
+    &:hover {
+        opacity: 100%;
+    }
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 30%;
+}
+
+#waveform-display {
+    background-color: red;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 75%;
+}
+
+.square {
+    background-image: url('../../assets/icons/white/square.svg');
+}
+
+.sine {
+    background-image: url('../../assets/icons/white/sine.svg');
+}
+
+.triangle {
+    background-image: url('../../assets/icons/white/triangle.svg');
+}
+
+.sawtooth {
+    background-image: url('../../assets/icons/white/sawtooth.svg');
+}

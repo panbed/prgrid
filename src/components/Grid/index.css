@@ -1,10 +1,14 @@
+.grid-layout {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  gap: 1em;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(16, 2vw);
   grid-auto-rows: 2vw;
   gap: 0.25rem;
-}
-
-button {
-  color: red;
 }

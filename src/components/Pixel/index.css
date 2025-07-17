@@ -2,12 +2,16 @@ button {
   background-color: black;
   border-style: solid;
   border-color: #2f2f2f;
-  border-radius: 0.25rem;
-  border-width: 0.25rem;
+  /* border-radius: 0.25rem; */
+  /* border-width: 0.25rem; */
 
   &:hover {
     background-color: #2f2f2f;
   }
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 75%;
 }
 
 .active {
@@ -25,4 +29,17 @@ button {
 
 .active.lit {
   transform: scale(1.25);
+}
+
+.squareTile {
+  background-image: url('../../assets/icons/black/square.svg');
+}
+.sineTile {
+  background-image: url('../../assets/icons/black/sine.svg');
+}
+.triangleTile {
+  background-image: url('../../assets/icons/black/triangle.svg');
+}
+.sawtoothTile {
+  background-image: url('../../assets/icons/black/sawtooth.svg');
 }

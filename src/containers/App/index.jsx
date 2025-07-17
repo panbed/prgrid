@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react'
 import Grid from '../../components/Grid'
 
 import './index.css'
-import Toolbar from '../../components/Toolbar'
 
 export default function App() {
   const [loading, setLoading] = useState(true)
@@ -38,7 +37,9 @@ export default function App() {
   function loadingLayout() {
     return (
       <div id='loading-container'>
-        <p>AudioContext is paused...</p>
+        <img src='/logo.webp'></img>
+        <p>audiocontext is paused</p>
+        <p>press any key to continue</p>
       </div>
     )
   }
@@ -47,7 +48,6 @@ export default function App() {
     return (
       <div id='grid-container'>
         <Grid audioContext={audioContextRef}/>
-        <Toolbar />
       </div>
     )
   }

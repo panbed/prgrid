@@ -2,28 +2,35 @@ import { useState, useEffect } from 'react'
 
 import './index.css'
 
-export default function Pixel({ id, className, onClick }) {
+export default function Pixel({ id, className, onClick, timeChange, time }) {
   const [isHovered, setIsHovered] = useState(false)
 
-  // useEffect(() => {
-  //   const handleKeyDown = (event) => {
-  //     switch (event.key) {
-  //       case 'ArrowLeft':
-  //         console.log(`${id} <-`)
-  //         break
-  //       case 'ArrowRight':
-  //         console.log(`${id} ->`)
-  //         break
-  //     }
-  //   }
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (isHovered && className.includes('lit')) {
+        if (event.key == 'ArrowLeft') {
+          console.log(`${id} <-`)
+          timeChange('shorter')
+        }
+        else if (event.key == 'ArrowRight') {
+          console.log(`${id} ->`)
+          timeChange('longer')
+        }
+        else if (event.key == 'ArrowUp') {
+          console.log(`${id} /\\`)
+        }
+        else if (event.key == 'ArrowDown') {
+          console.log(`${id} \\/`)
+        }
+      }
+    }
 
-  //   document.getElementById(id).addEventListener('keyup', handleKeyDown)
+    window.addEventListener('keydown', handleKeyPress)
 
-  //   return () => {
-  //     document.getElementById(id).removeEventListener('keyup', handleKeyDown)
-  //   }
-
-  // }, [])
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [isHovered, className])
 
   return (
     <button
@@ -31,7 +38,9 @@ export default function Pixel({ id, className, onClick }) {
       className={className}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}>
+      onClick={onClick}
+      style={{marginRight: (1 - (time * (1/0.35))) * 100}}
+    >
     </button>
   )
 }

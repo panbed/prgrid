@@ -2,16 +2,24 @@ import { useEffect, useState } from 'react'
 
 import Pixel from '../Pixel'
 import Synth from '../Synth'
+import Toolbar from '../Toolbar'
 
 import './index.css'
 
 // min/max note times
 const maxNoteTime = 0.35
 const minNoteTime = 0.05
+const noteTimeChange = 0.01
+const defaultNoteTime = maxNoteTime
 
 // min/max note volumes
 const maxNoteVol = 0.3
 const minNoteVol = 0.01
+const defaultNoteVol = maxNoteVol
+
+// waveforms
+const waveforms = ['square', 'sine', 'sawtooth', 'triangle']
+const defaultWaveform = waveforms[0]
 
 const startingHz = [
   55.00,      // a1
@@ -47,7 +55,7 @@ function generatePitchTable(startHz) {
   let pitches = []
 
   for (let i = 0; i < 16; i++) {
-    pitches[i] = (startHz * Math.pow((Math.pow(2, 1/12)), minorPentatonicScale[i])).toFixed(2)
+    pitches[i] = (startHz * Math.pow((Math.pow(2, 1 / 12)), minorPentatonicScale[i])).toFixed(2)
   }
 
   console.log(pitches)
@@ -63,19 +71,19 @@ function createGrid(w, h) {
     grid[i] = {
       id: i,
       pitch: pitches[16 - (Math.floor(i / 16) + 1)], // i just randomly put stuff in the calculator until this worked
-      sound: 'square',
+      sound: defaultWaveform,
       lit: false,
-      time: 0.35
+      time: defaultNoteTime
     }
   }
 
   return grid
 }
 
-function modifyGrid(grid, id, propName, propValue) {
+function modifyGrid(grid, id, updatedProps) {
   const newGrid = grid.map(item => {
     if (item.id === id) {
-      return { ...item, [propName]: propValue }
+      return { ...item, ...updatedProps }
     }
 
     return item
@@ -93,26 +101,28 @@ function getColumnIndexes(column) {
   return activeNotes
 }
 
-
-
 export default function Grid({ audioContext }) {
   // create grid, each cell has information about the note that'll be placed there
   const [grid, setGrid] = useState(() => createGrid(16, 16))
+  const [paused, setPaused] = useState(false)
   const [columnCounter, setColumnCounter] = useState(0) // current column, all notes in this column will be played (if theyre lit)
   const [activeNotes, setActiveNotes] = useState(() => getColumnIndexes(0)) // notes that are currently highlighted by the moving bar
   const [playbackRate, setPlaybackRate] = useState(150) // 'speed', one day itll be in bpm or something
+  const [currentWaveformIndex, setCurrentWaveformIndex] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveNotes(getColumnIndexes(columnCounter))
-      setColumnCounter((columnCounter + 1) % 16)
-      // console.log(activeNotes)
+      if (!paused) {
+        setActiveNotes(getColumnIndexes(columnCounter))
+        setColumnCounter((columnCounter + 1) % 16)
+      }
+
     }, playbackRate)
 
     return () => {
       clearInterval(interval)
     }
-  }, [columnCounter, playbackRate])
+  }, [columnCounter, playbackRate, paused])
 
   useEffect(() => {
     activeNotes.forEach((id) => {
@@ -128,33 +138,93 @@ export default function Grid({ audioContext }) {
     })
   }, [activeNotes, audioContext]) // TODO: this should have grid as a dependency but it kinda adds an annoying extra sound when clicking soo ...
 
+  // toolbar functions (pause, delete, save, change waveform)
+  const handlePause = () => {
+    console.log(`pause: ${paused}`)
+    setPaused(!paused)
+  }
+
+  const handleClear = () => {
+    console.log('clearing...')
+    let clearedGrid = createGrid(16, 16)
+    setGrid(clearedGrid)
+  }
+
+  const handleCopyToClipboard = () => {
+    let json = JSON.stringify(grid)
+    navigator.clipboard.writeText(json)
+    alert('copied to clipboard')
+  }
+
+  const handleWaveformChange = () => {
+    // set waveform to the next waveform string in the array, and then play a preview note
+    const waveformsLength = waveforms.length
+    setCurrentWaveformIndex((currentWaveformIndex + 1) % waveformsLength)
+    Synth(audioContext.current, 440.0, 0.3, waveforms[currentWaveformIndex - 1 % waveformsLength], audioContext.current.currentTime, audioContext.current.currentTime + defaultNoteTime)
+  }
+
   return (
-    <div className='grid'>
-      {grid && grid.map((note) => {
-        let id = note.id
-        let pitch = note.pitch
-        let sound = note.sound
-        let lit = note.lit
-        let time = note.time
+    <div className='grid-layout'>
+      <div className='grid'>
+        {grid && grid.map((note) => {
+          let id = note.id
+          let pitch = note.pitch
+          let sound = note.sound
+          let lit = note.lit
+          let time = note.time
 
-        let classes = []
+          let classes = []
 
-        if (activeNotes.includes(id)) classes.push('active')
-        if (lit) classes.push('lit')
+          if (activeNotes.includes(id)) {
+            classes.push('active')
+          }
+          
+          if (lit) {
+            classes.push('lit')
 
-        let classString = classes.join(" ")
+            if (sound == 'square') classes.push('squareTile')
+            else if (sound == 'sine') classes.push('sineTile')
+            else if (sound == 'sawtooth') classes.push('sawtoothTile')
+            else if (sound == 'triangle') classes.push('triangleTile')
+          }
 
-        // on click, light/unlight up the pixel
-        const handleClick = () => {
-          setGrid(modifyGrid(grid, id, 'lit', !lit))
-          let note = grid[id]
+          let classString = classes.join(" ")
 
-          if (!note.lit) Synth(audioContext.current, note.pitch, 0.3, note.sound, audioContext.current.currentTime, audioContext.current.currentTime + note.time)
-        }
+          // on click, light/unlight up the pixel
+          const handleClick = () => {
+            let note = grid[id]
 
-        return <Pixel key={id} id={id} className={classString} onClick={handleClick} />
+            // reset note time if we delit it
+            if (note.lit) setGrid(modifyGrid(grid, id, {lit: !lit, time: defaultNoteTime, sound: waveforms[currentWaveformIndex]}))
+            else setGrid(modifyGrid(grid, id, {lit: !lit, sound: waveforms[currentWaveformIndex]}))
 
-      })}
+            if (!note.lit) {
+              Synth(audioContext.current, note.pitch, 0.3, waveforms[currentWaveformIndex], audioContext.current.currentTime, audioContext.current.currentTime + note.time)
+            }
+          }
+
+          const handleTimeChange = (action) => {
+            if (action == 'shorter') {
+              time -= noteTimeChange
+              if (time <= minNoteTime) time = minNoteTime
+            }
+            else if (action == 'longer') {
+              time += noteTimeChange
+              if (time >= maxNoteTime) time = maxNoteTime
+            }
+            else if (action == 'reset') {
+              time = defaultNoteTime
+            }
+
+            setGrid(modifyGrid(grid, id, {time: time}))
+          }
+
+          return <Pixel key={id} id={id} className={classString} onClick={handleClick} timeChange={handleTimeChange} time={time}/>
+
+        })}
+      </div>
+      <Toolbar paused={paused} changePause={handlePause} clearGrid={handleClear} copyToClipboard={handleCopyToClipboard} waveform={waveforms[currentWaveformIndex]} changeWaveform={handleWaveformChange} />
+      
     </div>
   )
 }

@@ -1,3 +1,8 @@
+@font-face {
+  font-family: 'Kubasta';
+  src: url('./assets/fonts/Kubasta.ttf');
+}
+
 :root {
   color: white;
   background-color: black;
@@ -6,4 +11,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  font-family: 'Kubasta';
+
 }
