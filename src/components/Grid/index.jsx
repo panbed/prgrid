@@ -2,9 +2,17 @@ import { useEffect, useState } from 'react'
 
 import Pixel from '../Pixel'
 import Synth from '../Synth'
+
 import Toolbar from '../Toolbar'
+import Layerbar from '../LayerBar'
 
 import './index.css'
+
+// dimensions of grid
+const width = 16
+const height = 16
+const layerPixels = width * height
+const totalPixels = layerPixels * 4 // 4 layers
 
 // min/max note times
 const maxNoteTime = 0.35
@@ -58,19 +66,17 @@ function generatePitchTable(startHz) {
     pitches[i] = (startHz * Math.pow((Math.pow(2, 1 / 12)), minorPentatonicScale[i])).toFixed(2)
   }
 
-  console.log(pitches)
-
   return pitches
 }
 
-function createGrid(w, h) {
+function createGrid() {
   const grid = []
   const pitches = generatePitchTable(startingHz[3]) // TODO: magic nums...
 
-  for (let i = 0; i < w * h; i++) {
+  for (let i = 0; i < totalPixels; i++) {
     grid[i] = {
       id: i,
-      pitch: pitches[16 - (Math.floor(i / 16) + 1)], // i just randomly put stuff in the calculator until this worked
+      pitch: pitches[16 - ((Math.floor(i / 16) % 16) + 1)], // i just randomly put stuff in the calculator until this worked
       sound: defaultWaveform,
       lit: false,
       time: defaultNoteTime
@@ -94,7 +100,7 @@ function modifyGrid(grid, id, updatedProps) {
 
 function getColumnIndexes(column) {
   let activeNotes = []
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 16 * 4; i++) {
     activeNotes.push(column + (i * 16))
   }
 
@@ -102,8 +108,8 @@ function getColumnIndexes(column) {
 }
 
 export default function Grid({ audioContext }) {
-  // create grid, each cell has information about the note that'll be placed there
-  const [grid, setGrid] = useState(() => createGrid(16, 16))
+  const [grid, setGrid] = useState(() => createGrid()) // create grid (with 4 layers), each cell has information about the note that'll be placed there
+  const [layer, setLayer] = useState(0) // 4 layers (grid 0,1,2,3), default is grid 0
   const [paused, setPaused] = useState(false)
   const [columnCounter, setColumnCounter] = useState(0) // current column, all notes in this column will be played (if theyre lit)
   const [activeNotes, setActiveNotes] = useState(() => getColumnIndexes(0)) // notes that are currently highlighted by the moving bar
@@ -140,13 +146,12 @@ export default function Grid({ audioContext }) {
 
   // toolbar functions (pause, delete, save, change waveform)
   const handlePause = () => {
-    console.log(`pause: ${paused}`)
     setPaused(!paused)
   }
 
   const handleClear = () => {
     console.log('clearing...')
-    let clearedGrid = createGrid(16, 16)
+    let clearedGrid = createGrid()
     setGrid(clearedGrid)
   }
 
@@ -175,10 +180,15 @@ export default function Grid({ audioContext }) {
 
           let classes = []
 
+          // show grid button if its within the current layer (e.g. grid 0 is btwn 0-255)
+          if (!((id >= layerPixels * layer) && (id < layerPixels * (layer + 1)))) {
+            classes.push('grid-hidden')
+          }
+
           if (activeNotes.includes(id)) {
             classes.push('active')
           }
-          
+
           if (lit) {
             classes.push('lit')
 
@@ -223,8 +233,12 @@ export default function Grid({ audioContext }) {
 
         })}
       </div>
-      <Toolbar paused={paused} changePause={handlePause} clearGrid={handleClear} copyToClipboard={handleCopyToClipboard} waveform={waveforms[currentWaveformIndex]} changeWaveform={handleWaveformChange} />
-      
+      <div id='toolbar-container'>
+        <Toolbar paused={paused} changePause={handlePause} clearGrid={handleClear} copyToClipboard={handleCopyToClipboard} waveform={waveforms[currentWaveformIndex]} changeWaveform={handleWaveformChange} />
+      </div>
+      <div id='layer-container'>
+        <Layerbar layer={layer} setLayer={setLayer}/>
+      </div>
     </div>
   )
 }

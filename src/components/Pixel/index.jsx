@@ -35,7 +35,7 @@ export default function Pixel({ id, className, onClick, timeChange, time }) {
   return (
     <button
       id={id}
-      className={className}
+      className={'pixel-button ' + className}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}

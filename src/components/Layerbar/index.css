@@ -1,0 +1,30 @@
+.layer-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.layer-layout button {
+  cursor: pointer;
+  background-color: var(--bg);
+  color: white;
+  border: 0;
+  /* font-family: 'Kubasta'; */
+  /* font-size: large; */
+  padding: 1.5em 0.5em;
+  opacity: 0.5;
+
+  &:hover {
+    background-color: var(--bg-sec);
+    opacity: 1;
+  }
+
+  &:active {
+    transform: scale(0.85);
+  }
+
+  transition: all 0.5ms;
+}
+
+.active-layer {
+  background-color: var(--bg-sec) !important;
+}

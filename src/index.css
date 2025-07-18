@@ -4,6 +4,10 @@
 }
 
 :root {
+  --bg: #000000;
+  --bg-sec: #2f2f2f;
+  --fg: #ffffff
+
   color: white;
   background-color: black;
 
@@ -13,5 +17,4 @@
   -moz-osx-font-smoothing: grayscale;
 
   font-family: 'Kubasta';
-
 }

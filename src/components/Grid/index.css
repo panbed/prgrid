@@ -1,7 +1,8 @@
 .grid-layout {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  /* justify-content: center; */
+  justify-content: center;
   align-items: center;
   gap: 1em;
 }
@@ -11,4 +12,19 @@
   grid-template-columns: repeat(16, 2vw);
   grid-auto-rows: 2vw;
   gap: 0.25rem;
+}
+
+.grid-hidden {
+  display: none;
+}
+
+#toolbar-container {
+  position: absolute;
+  top: 105%;
+
+}
+
+#layer-container {
+  position: absolute;
+  left: -12.5%;
 }
