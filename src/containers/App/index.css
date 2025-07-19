@@ -28,3 +28,11 @@ body, html {
     margin: 0;
   }
 }
+
+/* mobile */
+@media only screen and (max-width: 800px) {
+  #grid-container {
+    padding: 0;
+    gap: 0px;
+  }
+}

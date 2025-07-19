@@ -28,3 +28,23 @@
   position: absolute;
   left: -12.5%;
 }
+
+#statusbar-container {
+  position: absolute;
+  bottom: 105%;
+  color: white;
+}
+
+/* mobile */
+@media only screen and (max-width: 800px) {
+  .grid {
+    gap: 0.1em;
+    grid-template-columns: repeat(16, 5.5vw);
+    grid-auto-rows: 5.5vw;
+  }
+
+  #layer-container {
+    left: auto;
+    bottom: -35%;
+  }
+}

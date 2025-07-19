@@ -4,7 +4,8 @@ import Pixel from '../Pixel'
 import Synth from '../Synth'
 
 import Toolbar from '../Toolbar'
-import Layerbar from '../LayerBar'
+import Layerbar from '../Layerbar'
+import Statusbar from '../Statusbar'
 
 import './index.css'
 
@@ -15,10 +16,11 @@ const layerPixels = width * height
 const totalPixels = layerPixels * 4 // 4 layers
 
 // min/max note times
+const noteTimes = [0.075, 0.15, 0.25, 0.35]
 const maxNoteTime = 0.35
 const minNoteTime = 0.05
 const noteTimeChange = 0.01
-const defaultNoteTime = maxNoteTime
+const defaultNoteTime = noteTimes[3]
 
 // min/max note volumes
 const maxNoteVol = 0.3
@@ -117,6 +119,7 @@ export default function Grid({ audioContext }) {
   const [currentWaveformIndex, setCurrentWaveformIndex] = useState(0)
 
   useEffect(() => {
+
     const interval = setInterval(() => {
       if (!paused) {
         setActiveNotes(getColumnIndexes(columnCounter))
@@ -170,6 +173,9 @@ export default function Grid({ audioContext }) {
 
   return (
     <div className='grid-layout'>
+      {/* <div id='statusbar-container'>
+        <Statusbar />
+      </div> */}
       <div className='grid'>
         {grid && grid.map((note) => {
           let id = note.id
@@ -215,16 +221,24 @@ export default function Grid({ audioContext }) {
 
           const handleTimeChange = (action) => {
             if (action == 'shorter') {
-              time -= noteTimeChange
-              if (time <= minNoteTime) time = minNoteTime
+              let timeIndex = noteTimes.indexOf(time) - 1
+
+              if (timeIndex < 0) timeIndex = noteTimes.length - 1
+
+              time = noteTimes[timeIndex]
             }
             else if (action == 'longer') {
-              time += noteTimeChange
-              if (time >= maxNoteTime) time = maxNoteTime
+              let timeIndex = noteTimes.indexOf(time) + 1
+
+              if (timeIndex >= noteTimes.length) timeIndex = 0
+
+              time = noteTimes[timeIndex]
             }
             else if (action == 'reset') {
               time = defaultNoteTime
             }
+
+            console.log(time)
 
             setGrid(modifyGrid(grid, id, {time: time}))
           }

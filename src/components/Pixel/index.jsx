@@ -39,8 +39,8 @@ export default function Pixel({ id, className, onClick, timeChange, time }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
-      style={{marginRight: (1 - (time * (1/0.35))) * 100}}
     >
+      <div className='inner-pixel-button' style={{marginLeft: (((time * (1/0.35))) * 100 + '%')}}></div>
     </button>
   )
 }
