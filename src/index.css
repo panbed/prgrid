@@ -3,13 +3,13 @@
   src: url('./assets/fonts/Kubasta.ttf');
 }
 
-:root {
+html, :root {
   --bg: #000000;
   --bg-sec: #2f2f2f;
   --fg: #ffffff
 
-  color: white;
-  background-color: black;
+  color: var(--fg);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

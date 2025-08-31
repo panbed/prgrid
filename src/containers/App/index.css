@@ -13,7 +13,7 @@ body, html {
 
 #loading-container {
   font-size: x-large;
-
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;

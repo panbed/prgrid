@@ -9,7 +9,6 @@ export default function Layerbar({ layer, setLayer }) {
     buttons.forEach((button) => {
       if (button.id == `layer-${layer}`) {
         button.classList.add('active-layer')
-        console.log(`active layer: ${layer}`)
       }
       else {
         button.classList.remove('active-layer')

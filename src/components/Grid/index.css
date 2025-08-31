@@ -29,6 +29,11 @@
   left: -12.5%;
 }
 
+#bank-container {
+  position: absolute;
+  bottom: 105%;
+}
+
 #statusbar-container {
   position: absolute;
   bottom: 105%;

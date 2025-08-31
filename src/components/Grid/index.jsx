@@ -5,6 +5,7 @@ import Synth from '../Synth'
 
 import Toolbar from '../Toolbar'
 import Layerbar from '../Layerbar'
+import Bankbar from '../Bankbar'
 import Statusbar from '../Statusbar'
 
 import './index.css'
@@ -159,9 +160,21 @@ export default function Grid({ audioContext }) {
   }
 
   const handleCopyToClipboard = () => {
-    let json = JSON.stringify(grid)
-    navigator.clipboard.writeText(json)
+    // copy just the current grid (+in the future maybe custom samples)
+    let json = {
+      grid: grid,
+      samples: ""
+    }
+
+    let jsonString = JSON.stringify(json)
+
+    navigator.clipboard.writeText(jsonString)
     alert('copied to clipboard')
+  }
+
+  const handleLoadData = (json) => {
+    // load (raw?) JSON into our grid
+
   }
 
   const handleWaveformChange = () => {
@@ -173,9 +186,10 @@ export default function Grid({ audioContext }) {
 
   return (
     <div className='grid-layout'>
-      {/* <div id='statusbar-container'>
-        <Statusbar />
-      </div> */}
+      <div id='bank-container'>
+        <Bankbar />
+      </div>
+
       <div className='grid'>
         {grid && grid.map((note) => {
           let id = note.id
@@ -247,9 +261,11 @@ export default function Grid({ audioContext }) {
 
         })}
       </div>
+
       <div id='toolbar-container'>
         <Toolbar paused={paused} changePause={handlePause} clearGrid={handleClear} copyToClipboard={handleCopyToClipboard} waveform={waveforms[currentWaveformIndex]} changeWaveform={handleWaveformChange} />
       </div>
+
       <div id='layer-container'>
         <Layerbar layer={layer} setLayer={setLayer}/>
       </div>
